@@ -198,7 +198,7 @@ ipcMain.on('stop-resizing', () => {});
 ipcMain.handle('get-version', () => app.getVersion());
 
 ipcMain.handle('open-external', (_e, url) => {
-  const allowed = ['https://www.paypal.com', 'https://github.com'];
+  const allowed = ['https://ko-fi.com', 'https://github.com'];
   if (allowed.some(prefix => url.startsWith(prefix))) shell.openExternal(url);
 });
 

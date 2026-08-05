@@ -205,10 +205,9 @@ clickthroughToggleBtn.addEventListener('click', () => {
   window.electronAPI.toggleClickThrough();
 });
 
-const PAYPAL_BUTTON_ID = 'HQUYF8Z6GPUZN';
 donateMenuBtn.addEventListener('click', () => {
   closeAllMenus();
-  window.electronAPI.openExternal(`https://www.paypal.com/donate?hosted_button_id=${PAYPAL_BUTTON_ID}`);
+  window.electronAPI.openExternal('https://ko-fi.com/V4T224ICAG');
 });
 
 twitchLoginBtn.addEventListener('click', async () => {

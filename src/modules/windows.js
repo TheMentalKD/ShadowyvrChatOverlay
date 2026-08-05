@@ -153,17 +153,17 @@ function createAboutWindow() {
   h2 { color: #fff; margin: 0; font-size: 18px; }
   p { margin: 0; font-size: 12px; color: #888; }
   .version { font-size: 13px; color: #9147ff; }
-  .donate-btn { margin-top: 14px; padding: 6px 16px; background: #9147ff; color: #fff; border: none; border-radius: 6px; font-size: 13px; font-family: inherit; cursor: pointer; }
-  .donate-btn:hover { background: #7b2fe8; }
+  .donate-btn { margin-top: 14px; padding: 6px 16px; background: #9673f5; color: #fff; border: none; border-radius: 6px; font-size: 13px; font-family: inherit; cursor: pointer; }
+  .donate-btn:hover { background: #7d55d4; }
 </style></head><body>
   <h2>Shadowyvr Chat Overlay</h2>
   <span class="version">v${version}</span>
   <p>Stream chat overlay for Twitch, YouTube &amp; Kick.</p>
   <p style="margin-top:12px">by The Mental KD</p>
-  <button class="donate-btn" id="donate-btn">❤ Donate via PayPal</button>
+  <button class="donate-btn" id="donate-btn">❤ Support me on Ko-fi</button>
   <script>
     document.getElementById('donate-btn').addEventListener('click', () => {
-      window.electronAPI.openExternal('https://www.paypal.com/donate?hosted_button_id=HQUYF8Z6GPUZN');
+      window.electronAPI.openExternal('https://ko-fi.com/V4T224ICAG');
     });
   </script>
 </body></html>`;
