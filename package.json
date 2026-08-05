@@ -1,0 +1,43 @@
+{
+  "name": "stream-chat-overlay",
+  "version": "1.1.0",
+  "description": "Shadowyvr Stream Chat Overlay",
+  "license": "MIT",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "tsc",
+    "dist": "electron-builder --publish always"
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.9",
+    "tmi.js": "^1.8.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/tmi.js": "^1.8.6",
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3",
+    "typescript": "^5.0.0"
+  },
+  "build": {
+    "appId": "com.shadowyvr.chatoverlay",
+    "productName": "Shadowyvr Chat Overlay",
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": "nsis"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "TheMentalKD",
+      "repo": "ShadowyvrChatOverlay"
+    }
+  }
+}

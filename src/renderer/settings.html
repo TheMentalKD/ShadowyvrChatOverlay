@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shadowyvr Chat Overlay — Settings</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="settings-page">
+  <div class="settings-container">
+    <div class="settings-title">Shadowyvr Chat Overlay</div>
+    <p class="hint" style="margin-top:-12px">Settings are saved automatically when you click Save.</p>
+
+    <div class="platform-tabs">
+      <button class="platform-btn active" data-platform="twitch">Twitch</button>
+      <button class="platform-btn" data-platform="youtube">YouTube</button>
+      <button class="platform-btn" data-platform="kick">Kick</button>
+    </div>
+
+    <div class="platform-page active" id="page-twitch">
+
+      <div class="settings-section">
+        <h3>Channel</h3>
+
+        <div id="auth-logged-out">
+          <button class="auth-btn" id="login-btn" type="button">Login with Twitch</button>
+          <p id="auth-error" class="auth-error" hidden></p>
+        </div>
+
+        <div id="auth-logged-in" hidden>
+          <div class="auth-status-row">
+            <span class="auth-status-dot"></span>
+            <span id="auth-username" class="auth-username"></span>
+            <button class="auth-btn auth-btn-secondary" id="logout-btn" type="button">Log out</button>
+          </div>
+
+          <div class="toggle-row" style="margin-top:12px">
+            <span>Show chat input during click-through</span>
+            <label class="toggle">
+              <input type="checkbox" id="show-chat-input" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <span class="hint">Chat input is always visible when click-through is off. Enable this to keep it visible when click-through is active.</span>
+        </div>
+
+        <div class="field" id="field-twitch" style="margin-top:12px">
+          <label>Twitch channel name</label>
+          <input type="text" id="twitch-channel" placeholder="yourchannelname" />
+          <span class="hint">The channel whose chat you want to monitor — log in above to also send messages</span>
+        </div>
+
+        <div style="margin-top:12px; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px">
+          <div class="toggle-row">
+            <span>Show shared chat messages</span>
+            <label class="toggle">
+              <input type="checkbox" id="show-shared-chat" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div id="shared-chat-sub" style="margin-left:16px; border-left:2px solid rgba(255,255,255,0.08); padding-left:14px;">
+            <div class="toggle-row">
+              <span>Show channel avatars</span>
+              <label class="toggle">
+                <input type="checkbox" id="show-shared-avatars" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section appearance-section">
+        <h3>Appearance</h3>
+        <p class="hint" style="margin-top:-8px">These settings apply to Twitch, YouTube and Kick chat together.</p>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Font size (px)</label>
+            <input type="number" data-base="font-size" id="font-size-twitch" min="10" max="28" value="14" />
+          </div>
+          <div class="field">
+            <label>Max messages</label>
+            <input type="number" data-base="max-messages" id="max-messages-twitch" min="20" max="500" value="100" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Font</label>
+          <input type="search" data-base="font-search" id="font-search-twitch" placeholder="Search open-source or local fonts…" />
+          <select data-base="font-family" id="font-family-twitch" size="8"></select>
+          <span class="hint">Open-source fonts load from Google Fonts; local fonts are installed on this PC</span>
+          <p data-base="font-preview" id="font-preview-twitch" class="font-preview">The quick brown fox jumps over the lazy dog 0123456789</p>
+        </div>
+
+        <div class="field">
+          <label>Fade messages after (seconds)</label>
+          <input type="number" data-base="message-fade" id="message-fade-twitch" min="0" step="1" value="0" placeholder="0" />
+          <span class="hint">Type any number of seconds — 0 means never fade</span>
+        </div>
+
+        <div class="color-section">
+          <button type="button" class="color-section-toggle" data-base="bg-section-toggle" id="bg-section-toggle-twitch">
+            <span>Background</span>
+            <div class="color-section-swatch" data-base="bg-section-swatch" id="bg-section-swatch-twitch"></div>
+            <span class="color-section-arrow">▾</span>
+          </button>
+          <div class="color-section-body" data-base="bg-section-body" id="bg-section-body-twitch" hidden>
+            <div class="field">
+              <label>Background colour</label>
+              <div class="color-field-wrap" data-base="bg-color-wrap" id="bg-color-wrap-twitch">
+                <div class="color-preview-row">
+                  <input type="text" data-base="bg-color" id="bg-color-twitch" placeholder="rgba(0,0,0,0.45)" class="color-text-input" />
+                  <button type="button" class="color-swatch picker-swatch-btn" data-base="bg-picker-toggle" id="bg-picker-toggle-twitch" title="Open colour picker"></button>
+                </div>
+                <div class="color-picker-panel" data-base="bg-picker-panel" id="bg-picker-panel-twitch" hidden>
+                  <canvas class="color-canvas" data-base="bg-canvas" id="bg-canvas-twitch" width="220" height="140"></canvas>
+                  <div class="picker-cursor" data-base="bg-cursor" id="bg-cursor-twitch"></div>
+                  <div class="hue-row">
+                    <label class="picker-label">Hue</label>
+                    <input type="range" class="hue-slider" data-base="bg-hue" id="bg-hue-twitch" min="0" max="360" value="0" />
+                  </div>
+                  <div class="hue-row">
+                    <label class="picker-label">Opacity</label>
+                    <input type="range" class="opacity-picker-slider" data-base="bg-alpha" id="bg-alpha-twitch" min="0" max="100" value="45" />
+                  </div>
+                  <div class="format-toggle-row">
+                    <button type="button" class="format-btn active" data-base="bg-fmt-hex" id="bg-fmt-hex-twitch">HEX</button>
+                    <button type="button" class="format-btn" data-base="bg-fmt-rgba" id="bg-fmt-rgba-twitch">RGBA</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <label>Background opacity <span data-base="opacity-val" id="opacity-val-twitch">90%</span></label>
+              <input type="range" data-base="opacity" id="opacity-twitch" min="10" max="100" value="90" />
+            </div>
+          </div>
+        </div>
+
+        <div class="color-section">
+          <button type="button" class="color-section-toggle" data-base="text-section-toggle" id="text-section-toggle-twitch">
+            <span>Text &amp; Shadow</span>
+            <div class="color-section-swatch" data-base="text-section-swatch" id="text-section-swatch-twitch"></div>
+            <span class="color-section-arrow">▾</span>
+          </button>
+          <div class="color-section-body" data-base="text-section-body" id="text-section-body-twitch" hidden>
+            <div class="field">
+              <label>Text colour</label>
+              <div class="color-field-wrap" data-base="text-color-wrap" id="text-color-wrap-twitch">
+                <div class="color-preview-row">
+                  <input type="text" data-base="text-color" id="text-color-twitch" placeholder="#ffffff" class="color-text-input" />
+                  <button type="button" class="color-swatch picker-swatch-btn" data-base="text-picker-toggle" id="text-picker-toggle-twitch" title="Open colour picker"></button>
+                </div>
+                <div class="color-picker-panel" data-base="text-picker-panel" id="text-picker-panel-twitch" hidden>
+                  <canvas class="color-canvas" data-base="text-canvas" id="text-canvas-twitch" width="220" height="140"></canvas>
+                  <div class="picker-cursor" data-base="text-cursor" id="text-cursor-twitch"></div>
+                  <div class="hue-row">
+                    <label class="picker-label">Hue</label>
+                    <input type="range" class="hue-slider" data-base="text-hue" id="text-hue-twitch" min="0" max="360" value="0" />
+                  </div>
+                  <div class="hue-row">
+                    <label class="picker-label">Opacity</label>
+                    <input type="range" class="opacity-picker-slider" data-base="text-alpha" id="text-alpha-twitch" min="0" max="100" value="100" />
+                  </div>
+                  <div class="format-toggle-row">
+                    <button type="button" class="format-btn active" data-base="text-fmt-hex" id="text-fmt-hex-twitch">HEX</button>
+                    <button type="button" class="format-btn" data-base="text-fmt-rgba" id="text-fmt-rgba-twitch">RGBA</button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+            <div class="toggle-row">
+              <span>Text shadow</span>
+              <label class="toggle">
+                <input type="checkbox" data-base="text-shadow" id="text-shadow-twitch" />
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="field" data-base="shadow-opacity-field" id="shadow-opacity-field-twitch">
+              <label>Shadow opacity <span data-base="shadow-opacity-val" id="shadow-opacity-val-twitch">90%</span></label>
+              <input type="range" data-base="shadow-opacity" id="shadow-opacity-twitch" min="0" max="100" value="90" />
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="settings-section">
+        <h3>Twitch Events</h3>
+
+        <div class="color-section">
+          <button type="button" class="color-section-toggle" id="events-section-toggle">
+            <span>Event types</span>
+            <span class="color-section-arrow">▾</span>
+          </button>
+          <div class="color-section-body" id="events-section-body" hidden>
+            <p class="hint" style="margin:0 0 8px">Show alerts for Twitch channel events. Useful if you don't use a bot like Wizebot or StreamElements.</p>
+
+            <div class="toggle-row">
+              <span>Subscriptions</span>
+              <label class="toggle">
+                <input type="checkbox" id="event-subs" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <span>Gifted subscriptions</span>
+              <label class="toggle">
+                <input type="checkbox" id="event-subgifts" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <span>Raids</span>
+              <label class="toggle">
+                <input type="checkbox" id="event-raids" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <span>Cheers / Bits</span>
+              <label class="toggle">
+                <input type="checkbox" id="event-cheers" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <span>Follows</span>
+              <label class="toggle">
+                <input type="checkbox" id="event-follows" />
+                <span class="slider"></span>
+              </label>
+            </div>
+            <span class="hint" style="display:block;margin-top:4px">Follows require the channel owner to be logged in.</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="settings-section">
+        <h3>Chat Options</h3>
+
+        <div class="toggle-row">
+          <span>Show timestamps</span>
+          <label class="toggle">
+            <input type="checkbox" id="show-timestamps" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <span>Show Twitch badges</span>
+          <label class="toggle">
+            <input type="checkbox" id="show-badges" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <span>Highlight Mod/VIP names</span>
+          <label class="toggle">
+            <input type="checkbox" id="show-mod-vip-highlight" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <span class="hint">Adds a colored background behind the username — green for mods, blue for VIPs.</span>
+
+        <div class="toggle-row">
+          <span>Show reply threads</span>
+          <label class="toggle">
+            <input type="checkbox" id="show-reply-threads" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <span class="hint">Shows which message a reply is responding to, above the reply itself.</span>
+
+      </div>
+
+      <div class="settings-section">
+        <h3>Filters</h3>
+
+        <div class="toggle-row">
+          <span>Ignore bot messages</span>
+          <label class="toggle">
+            <input type="checkbox" id="filter-bots" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div id="filter-bots-sub" class="filter-sub">
+          <label>Ignored bots <span class="hint">(space or comma separated)</span></label>
+          <textarea id="ignored-bots" rows="2" placeholder="Nightbot StreamElements Moobot…"></textarea>
+        </div>
+
+        <div class="toggle-row" style="margin-top:10px">
+          <span>Ignore commands</span>
+          <label class="toggle">
+            <input type="checkbox" id="filter-commands" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <span class="hint">Hides all ! commands (e.g. !so, !sr, !lurk) and Twitch slash commands (/shoutout, /timeout, /ban…)</span>
+
+        <div style="margin-top:10px">
+          <label>Blocked users <span class="hint">(space or comma separated — always hidden)</span></label>
+          <textarea id="blocked-users" rows="2" placeholder="username1 username2…"></textarea>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>Behaviour</h3>
+
+        <div class="toggle-row">
+          <span>Click-through (overlay ignores mouse)</span>
+          <label class="toggle">
+            <input type="checkbox" id="click-through" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <span>Hide from screen capture</span>
+          <label class="toggle">
+            <input type="checkbox" id="hide-from-capture" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <span class="hint">Overlay stays visible to you, but is excluded from OBS, Discord/Zoom screen share, and screenshots. Not supported on Linux.</span>
+
+        <div class="field">
+          <label>Click-through hotkey</label>
+          <input type="text" id="toggle-key" placeholder="F9" />
+          <span class="hint">Toggles click-through on/off (e.g. F9, Alt+C) — overlay stays visible</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="platform-page" id="page-youtube">
+      <div class="settings-section">
+        <h3>Channel</h3>
+        <div class="field">
+          <label>YouTube live video ID</label>
+          <input type="text" id="youtube-id" placeholder="dQw4w9WgXcQ" />
+          <span class="hint">The part after ?v= in the video URL</span>
+        </div>
+      </div>
+      <div class="settings-section appearance-section">
+        <h3>Appearance</h3>
+        <p class="hint" style="margin-top:-8px">These settings apply to Twitch, YouTube and Kick chat together.</p>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Font size (px)</label>
+            <input type="number" data-base="font-size" id="font-size-youtube" min="10" max="28" value="14" />
+          </div>
+          <div class="field">
+            <label>Max messages</label>
+            <input type="number" data-base="max-messages" id="max-messages-youtube" min="20" max="500" value="100" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Font</label>
+          <input type="search" data-base="font-search" id="font-search-youtube" placeholder="Search open-source or local fonts…" />
+          <select data-base="font-family" id="font-family-youtube" size="8"></select>
+          <span class="hint">Open-source fonts load from Google Fonts; local fonts are installed on this PC</span>
+          <p data-base="font-preview" id="font-preview-youtube" class="font-preview">The quick brown fox jumps over the lazy dog 0123456789</p>
+        </div>
+
+        <div class="field">
+          <label>Fade messages after (seconds)</label>
+          <input type="number" data-base="message-fade" id="message-fade-youtube" min="0" step="1" value="0" placeholder="0" />
+          <span class="hint">Type any number of seconds — 0 means never fade</span>
+        </div>
+
+        <div class="color-section">
+          <button type="button" class="color-section-toggle" data-base="bg-section-toggle" id="bg-section-toggle-youtube">
+            <span>Background</span>
+            <div class="color-section-swatch" data-base="bg-section-swatch" id="bg-section-swatch-youtube"></div>
+            <span class="color-section-arrow">▾</span>
+          </button>
+          <div class="color-section-body" data-base="bg-section-body" id="bg-section-body-youtube" hidden>
+            <div class="field">
+              <label>Background colour</label>
+              <div class="color-field-wrap" data-base="bg-color-wrap" id="bg-color-wrap-youtube">
+                <div class="color-preview-row">
+                  <input type="text" data-base="bg-color" id="bg-color-youtube" placeholder="rgba(0,0,0,0.45)" class="color-text-input" />
+                  <button type="button" class="color-swatch picker-swatch-btn" data-base="bg-picker-toggle" id="bg-picker-toggle-youtube" title="Open colour picker"></button>
+                </div>
+                <div class="color-picker-panel" data-base="bg-picker-panel" id="bg-picker-panel-youtube" hidden>
+                  <canvas class="color-canvas" data-base="bg-canvas" id="bg-canvas-youtube" width="220" height="140"></canvas>
+                  <div class="picker-cursor" data-base="bg-cursor" id="bg-cursor-youtube"></div>
+                  <div class="hue-row">
+                    <label class="picker-label">Hue</label>
+                    <input type="range" class="hue-slider" data-base="bg-hue" id="bg-hue-youtube" min="0" max="360" value="0" />
+                  </div>
+                  <div class="hue-row">
+                    <label class="picker-label">Opacity</label>
+                    <input type="range" class="opacity-picker-slider" data-base="bg-alpha" id="bg-alpha-youtube" min="0" max="100" value="45" />
+                  </div>
+                  <div class="format-toggle-row">
+                    <button type="button" class="format-btn active" data-base="bg-fmt-hex" id="bg-fmt-hex-youtube">HEX</button>
+                    <button type="button" class="format-btn" data-base="bg-fmt-rgba" id="bg-fmt-rgba-youtube">RGBA</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <label>Background opacity <span data-base="opacity-val" id="opacity-val-youtube">90%</span></label>
+              <input type="range" data-base="opacity" id="opacity-youtube" min="10" max="100" value="90" />
+            </div>
+          </div>
+        </div>
+
+        <div class="color-section">
+          <button type="button" class="color-section-toggle" data-base="text-section-toggle" id="text-section-toggle-youtube">
+            <span>Text &amp; Shadow</span>
+            <div class="color-section-swatch" data-base="text-section-swatch" id="text-section-swatch-youtube"></div>
+            <span class="color-section-arrow">▾</span>
+          </button>
+          <div class="color-section-body" data-base="text-section-body" id="text-section-body-youtube" hidden>
+            <div class="field">
+              <label>Text colour</label>
+              <div class="color-field-wrap" data-base="text-color-wrap" id="text-color-wrap-youtube">
+                <div class="color-preview-row">
+                  <input type="text" data-base="text-color" id="text-color-youtube" placeholder="#ffffff" class="color-text-input" />
+                  <button type="button" class="color-swatch picker-swatch-btn" data-base="text-picker-toggle" id="text-picker-toggle-youtube" title="Open colour picker"></button>
+                </div>
+                <div class="color-picker-panel" data-base="text-picker-panel" id="text-picker-panel-youtube" hidden>
+                  <canvas class="color-canvas" data-base="text-canvas" id="text-canvas-youtube" width="220" height="140"></canvas>
+                  <div class="picker-cursor" data-base="text-cursor" id="text-cursor-youtube"></div>
+                  <div class="hue-row">
+                    <label class="picker-label">Hue</label>
+                    <input type="range" class="hue-slider" data-base="text-hue" id="text-hue-youtube" min="0" max="360" value="0" />
+                  </div>
+                  <div class="hue-row">
+                    <label class="picker-label">Opacity</label>
+                    <input type="range" class="opacity-picker-slider" data-base="text-alpha" id="text-alpha-youtube" min="0" max="100" value="100" />
+                  </div>
+                  <div class="format-toggle-row">
+                    <button type="button" class="format-btn active" data-base="text-fmt-hex" id="text-fmt-hex-youtube">HEX</button>
+                    <button type="button" class="format-btn" data-base="text-fmt-rgba" id="text-fmt-rgba-youtube">RGBA</button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+            <div class="toggle-row">
+              <span>Text shadow</span>
+              <label class="toggle">
+                <input type="checkbox" data-base="text-shadow" id="text-shadow-youtube" />
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="field" data-base="shadow-opacity-field" id="shadow-opacity-field-youtube">
+              <label>Shadow opacity <span data-base="shadow-opacity-val" id="shadow-opacity-val-youtube">90%</span></label>
+              <input type="range" data-base="shadow-opacity" id="shadow-opacity-youtube" min="0" max="100" value="90" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section coming-soon-section">
+        <h3>Coming Soon</h3>
+        <p class="hint">YouTube-specific settings such as member badges and Super Chat highlights will be available in a future update.</p>
+      </div>
+    </div>
+
+    <div class="platform-page" id="page-kick">
+      <div class="settings-section">
+        <h3>Channel</h3>
+        <div class="field">
+          <label>Kick chat room ID</label>
+          <input type="text" id="kick-channel" placeholder="12345678" />
+          <span class="hint">Numeric room ID from your Kick channel page</span>
+        </div>
+      </div>
+      <div class="settings-section appearance-section">
+        <h3>Appearance</h3>
+        <p class="hint" style="margin-top:-8px">These settings apply to Twitch, YouTube and Kick chat together.</p>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Font size (px)</label>
+            <input type="number" data-base="font-size" id="font-size-kick" min="10" max="28" value="14" />
+          </div>
+          <div class="field">
+            <label>Max messages</label>
+            <input type="number" data-base="max-messages" id="max-messages-kick" min="20" max="500" value="100" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Font</label>
+          <input type="search" data-base="font-search" id="font-search-kick" placeholder="Search open-source or local fonts…" />
+          <select data-base="font-family" id="font-family-kick" size="8"></select>
+          <span class="hint">Open-source fonts load from Google Fonts; local fonts are installed on this PC</span>
+          <p data-base="font-preview" id="font-preview-kick" class="font-preview">The quick brown fox jumps over the lazy dog 0123456789</p>
+        </div>
+
+        <div class="field">
+          <label>Fade messages after (seconds)</label>
+          <input type="number" data-base="message-fade" id="message-fade-kick" min="0" step="1" value="0" placeholder="0" />
+          <span class="hint">Type any number of seconds — 0 means never fade</span>
+        </div>
+
+        <div class="color-section">
+          <button type="button" class="color-section-toggle" data-base="bg-section-toggle" id="bg-section-toggle-kick">
+            <span>Background</span>
+            <div class="color-section-swatch" data-base="bg-section-swatch" id="bg-section-swatch-kick"></div>
+            <span class="color-section-arrow">▾</span>
+          </button>
+          <div class="color-section-body" data-base="bg-section-body" id="bg-section-body-kick" hidden>
+            <div class="field">
+              <label>Background colour</label>
+              <div class="color-field-wrap" data-base="bg-color-wrap" id="bg-color-wrap-kick">
+                <div class="color-preview-row">
+                  <input type="text" data-base="bg-color" id="bg-color-kick" placeholder="rgba(0,0,0,0.45)" class="color-text-input" />
+                  <button type="button" class="color-swatch picker-swatch-btn" data-base="bg-picker-toggle" id="bg-picker-toggle-kick" title="Open colour picker"></button>
+                </div>
+                <div class="color-picker-panel" data-base="bg-picker-panel" id="bg-picker-panel-kick" hidden>
+                  <canvas class="color-canvas" data-base="bg-canvas" id="bg-canvas-kick" width="220" height="140"></canvas>
+                  <div class="picker-cursor" data-base="bg-cursor" id="bg-cursor-kick"></div>
+                  <div class="hue-row">
+                    <label class="picker-label">Hue</label>
+                    <input type="range" class="hue-slider" data-base="bg-hue" id="bg-hue-kick" min="0" max="360" value="0" />
+                  </div>
+                  <div class="hue-row">
+                    <label class="picker-label">Opacity</label>
+                    <input type="range" class="opacity-picker-slider" data-base="bg-alpha" id="bg-alpha-kick" min="0" max="100" value="45" />
+                  </div>
+                  <div class="format-toggle-row">
+                    <button type="button" class="format-btn active" data-base="bg-fmt-hex" id="bg-fmt-hex-kick">HEX</button>
+                    <button type="button" class="format-btn" data-base="bg-fmt-rgba" id="bg-fmt-rgba-kick">RGBA</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <label>Background opacity <span data-base="opacity-val" id="opacity-val-kick">90%</span></label>
+              <input type="range" data-base="opacity" id="opacity-kick" min="10" max="100" value="90" />
+            </div>
+          </div>
+        </div>
+
+        <div class="color-section">
+          <button type="button" class="color-section-toggle" data-base="text-section-toggle" id="text-section-toggle-kick">
+            <span>Text &amp; Shadow</span>
+            <div class="color-section-swatch" data-base="text-section-swatch" id="text-section-swatch-kick"></div>
+            <span class="color-section-arrow">▾</span>
+          </button>
+          <div class="color-section-body" data-base="text-section-body" id="text-section-body-kick" hidden>
+            <div class="field">
+              <label>Text colour</label>
+              <div class="color-field-wrap" data-base="text-color-wrap" id="text-color-wrap-kick">
+                <div class="color-preview-row">
+                  <input type="text" data-base="text-color" id="text-color-kick" placeholder="#ffffff" class="color-text-input" />
+                  <button type="button" class="color-swatch picker-swatch-btn" data-base="text-picker-toggle" id="text-picker-toggle-kick" title="Open colour picker"></button>
+                </div>
+                <div class="color-picker-panel" data-base="text-picker-panel" id="text-picker-panel-kick" hidden>
+                  <canvas class="color-canvas" data-base="text-canvas" id="text-canvas-kick" width="220" height="140"></canvas>
+                  <div class="picker-cursor" data-base="text-cursor" id="text-cursor-kick"></div>
+                  <div class="hue-row">
+                    <label class="picker-label">Hue</label>
+                    <input type="range" class="hue-slider" data-base="text-hue" id="text-hue-kick" min="0" max="360" value="0" />
+                  </div>
+                  <div class="hue-row">
+                    <label class="picker-label">Opacity</label>
+                    <input type="range" class="opacity-picker-slider" data-base="text-alpha" id="text-alpha-kick" min="0" max="100" value="100" />
+                  </div>
+                  <div class="format-toggle-row">
+                    <button type="button" class="format-btn active" data-base="text-fmt-hex" id="text-fmt-hex-kick">HEX</button>
+                    <button type="button" class="format-btn" data-base="text-fmt-rgba" id="text-fmt-rgba-kick">RGBA</button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+            <div class="toggle-row">
+              <span>Text shadow</span>
+              <label class="toggle">
+                <input type="checkbox" data-base="text-shadow" id="text-shadow-kick" />
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="field" data-base="shadow-opacity-field" id="shadow-opacity-field-kick">
+              <label>Shadow opacity <span data-base="shadow-opacity-val" id="shadow-opacity-val-kick">90%</span></label>
+              <input type="range" data-base="shadow-opacity" id="shadow-opacity-kick" min="0" max="100" value="90" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section coming-soon-section">
+        <h3>Coming Soon</h3>
+        <p class="hint">Kick-specific settings such as channel point reward alerts will be available in a future update.</p>
+      </div>
+    </div>
+
+    <button class="save-btn" id="save-btn">Save &amp; Apply</button>
+
+
+
+  </div>
+
+  <script src="fonts.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>

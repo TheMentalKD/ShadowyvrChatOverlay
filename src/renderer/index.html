@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shadowyvr Chat Overlay</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="resize-handle resize-n"  data-dir="top"></div>
+  <div class="resize-handle resize-s"  data-dir="bottom"></div>
+  <div class="resize-handle resize-e"  data-dir="right"></div>
+  <div class="resize-handle resize-w"  data-dir="left"></div>
+  <div class="resize-handle resize-ne" data-dir="top-right"></div>
+  <div class="resize-handle resize-nw" data-dir="top-left"></div>
+  <div class="resize-handle resize-se" data-dir="bottom-right"></div>
+  <div class="resize-handle resize-sw" data-dir="bottom-left"></div>
+
+  <div class="menu-dropdown" id="menu-file-dropdown">
+    <button class="menu-action" id="connect-btn" type="button">Connect</button>
+    <div class="menu-separator"></div>
+    <button class="menu-action" id="twitch-login-btn" type="button">Login with Twitch</button>
+    <button class="menu-action" id="twitch-logout-btn" type="button">Logout from Twitch</button>
+    <div class="menu-separator"></div>
+    <button class="menu-action" id="close-btn-menu" type="button">Exit</button>
+  </div>
+  <div class="menu-dropdown" id="menu-settings-dropdown">
+    <button class="menu-action" id="settings-btn" type="button">Open Settings…</button>
+    <div class="menu-separator"></div>
+    <button class="menu-action" id="clickthrough-toggle-btn" type="button">Click-Through: OFF</button>
+  </div>
+  <div class="menu-dropdown" id="menu-help-dropdown">
+    <button class="menu-action" id="update-btn" type="button">Check for Updates</button>
+    <div class="menu-separator"></div>
+    <button class="menu-action" id="donate-menu-btn" type="button">❤ Donate via PayPal</button>
+    <div class="menu-separator"></div>
+    <button class="menu-action" id="about-btn" type="button">About</button>
+  </div>
+
+  <div class="reconnect-popover" id="reconnect-popover" hidden>
+    <label for="reconnect-channel-input">Reconnect to channel</label>
+    <input id="reconnect-channel-input" class="channel-input" type="text" placeholder="channel name" maxlength="32" autocomplete="off" />
+    <div class="reconnect-popover-actions">
+      <button id="reconnect-cancel-btn" class="reconnect-btn-secondary" type="button">Cancel</button>
+      <button id="reconnect-confirm-btn" class="reconnect-btn-primary" type="button">Connect</button>
+    </div>
+  </div>
+
+  <div id="app">
+    <div id="drag-handle" title="Drag to move">
+      <nav id="header-menu" class="header-menu">
+        <div class="menu-item" id="menu-file" data-dropdown="menu-file-dropdown">
+          <span class="menu-label">File</span>
+        </div>
+        <div class="menu-item" id="menu-settings" data-dropdown="menu-settings-dropdown">
+          <span class="menu-label">Settings</span>
+        </div>
+        <div class="menu-item" id="menu-help" data-dropdown="menu-help-dropdown">
+          <span class="menu-label">Help</span>
+        </div>
+      </nav>
+      <span id="status-dot" class="dot disconnected"></span>
+      <span id="status-text">Not connected</span>
+      <span class="app-name-label">Shadowyvr Chat Overlay</span>
+      <span id="version-label" class="version-label"></span>
+      <span id="clickthrough-indicator" title="Click-through is ON — clicks pass to your game">🔒</span>
+      <button id="close-btn" class="header-close-btn" title="Close overlay" type="button">✕</button>
+    </div>
+
+    <div id="chat-container">
+      <div id="messages"></div>
+    </div>
+
+    <div id="chat-input-bar" hidden>
+      <input id="chat-input" type="text" placeholder="Send a message…" maxlength="500" spellcheck="true" autocomplete="off" />
+      <button id="chat-send-btn" type="button" title="Send">➤</button>
+    </div>
+
+    <div id="empty-state">
+      <div id="empty-logged-out">
+        <p>Not logged in.</p>
+        <p class="empty-hint">Log in with Twitch to connect to your channel.</p>
+        <button id="login-btn-main" class="connect-btn-main" type="button">Login with Twitch</button>
+        <p id="connect-error" class="auth-error" hidden></p>
+      </div>
+      <div id="empty-no-channel" hidden>
+        <p>Logged in as <span id="empty-username"></span>.</p>
+        <p class="empty-hint">Set a channel to connect to in Settings.</p>
+        <button id="open-settings-btn-main" class="connect-btn-main" type="button">Open Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="update-banner" hidden>
+    <span id="update-banner-text"></span>
+    <div class="update-banner-actions">
+      <button id="update-download-btn" type="button">Download</button>
+      <button id="update-dismiss-btn" type="button">Dismiss</button>
+    </div>
+  </div>
+  <script src="fonts.js"></script>
+  <script src="chat.js"></script>
+  <script src="resize.js"></script>
+</body>
+</html>
