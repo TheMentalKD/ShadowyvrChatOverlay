@@ -58,3 +58,6 @@ Windows: `%APPDATA%\stream-chat-overlay\config.json`
 ## License
 
 Source-available under a custom license — free for personal, non-commercial use and modification. Commercial use, resale, or redistribution as your own product requires permission. See LICENSE.md for full terms.
+
+
+<img width="1240" height="716" alt="image" src="https://github.com/user-attachments/assets/5415976e-ae8b-4792-b133-b0ae6c2df3bf" />
