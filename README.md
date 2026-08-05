@@ -4,6 +4,8 @@ A transparent, always-on-top desktop chat overlay for streamers — built with E
 
 Any chat overlay requires the games to be 'WINDOWED FULLSCREEN' or 'BORDERLESS FULLSCREEN' for it to work sufficiently. This is a windows issue where the GPU draws anything fullscreen to the front of the screen and will conflict with the chat overlay if the graphics settings are fixed to 'FULLSCREEN'
 
+Any and all issues, feel free to submit these and I shall work on them as soon as possible.
+
 ## Why I built this
 
 I am a streamer first and foremost. I've only recently started dabbling in javascript, Typescript, & Python. This application Shadowyvr Chat Overlay is something I set my mind in creating and building upon because of other streamer friends.
