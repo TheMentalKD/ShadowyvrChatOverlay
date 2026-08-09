@@ -623,20 +623,33 @@ function appendMessage({ messageId, userId, username, text, color, sourceChannel
       body.appendChild(badgesEl);
     }
 
+    const showNameplates = config?.showNameplates !== false;
+    const showForMod     = config?.nameplateMod !== false;
+    const showForVip     = config?.nameplateVip !== false;
+    const showForNormal  = config?.nameplateNormal !== false;
+    const useNameplate   = showNameplates && (isMod ? showForMod : isVip ? showForVip : showForNormal);
+
     const user = document.createElement('span');
     user.className = 'username';
-    if (config?.showModVipHighlight) {
-      if (isMod) user.classList.add('role-highlight', 'role-mod');
-      else if (isVip) user.classList.add('role-highlight', 'role-vip');
-    }
     user.textContent = username;
-    user.style.color = color || '#9147ff';
-    body.appendChild(user);
 
-    const colon = document.createElement('span');
-    colon.className = 'colon';
-    colon.textContent = ':';
-    body.appendChild(colon);
+    if (useNameplate) {
+      const nameplate = document.createElement('span');
+      nameplate.className = 'nameplate';
+      const userColor = color || '#9147ff';
+      nameplate.style.setProperty('--nameplate-color', userColor);
+      if (isMod) nameplate.classList.add('role-mod');
+      else if (isVip) nameplate.classList.add('role-vip');
+      nameplate.appendChild(user);
+      body.appendChild(nameplate);
+    } else {
+      user.style.color = color || '#9147ff';
+      body.appendChild(user);
+      const colon = document.createElement('span');
+      colon.className = 'colon';
+      colon.textContent = ':';
+      body.appendChild(colon);
+    }
 
     const textEl = document.createElement('span');
     textEl.className = 'text';

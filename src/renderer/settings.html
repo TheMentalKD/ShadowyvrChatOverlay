@@ -264,13 +264,37 @@
         </div>
 
         <div class="toggle-row">
-          <span>Highlight Mod/VIP names</span>
+          <span>Show nameplates</span>
           <label class="toggle">
-            <input type="checkbox" id="show-mod-vip-highlight" />
+            <input type="checkbox" id="show-nameplates" checked />
             <span class="slider"></span>
           </label>
         </div>
-        <span class="hint">Adds a colored background behind the username — green for mods, blue for VIPs.</span>
+        <span class="hint">Shows a colour-coded pill behind each username using their Twitch chat colour.</span>
+
+        <div class="filter-sub" id="nameplate-suboptions">
+          <div class="toggle-row sub-toggle-row">
+            <span>Normal viewers</span>
+            <label class="toggle toggle-sm">
+              <input type="checkbox" id="nameplate-normal" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row sub-toggle-row">
+            <span>Mods</span>
+            <label class="toggle toggle-sm">
+              <input type="checkbox" id="nameplate-mod" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row sub-toggle-row">
+            <span>VIPs</span>
+            <label class="toggle toggle-sm">
+              <input type="checkbox" id="nameplate-vip" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
 
         <div class="toggle-row">
           <span>Show reply threads</span>

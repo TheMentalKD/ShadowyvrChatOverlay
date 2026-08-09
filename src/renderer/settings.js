@@ -217,7 +217,11 @@ window.electronAPI.getConfig().then(async (config) => {
 
   document.getElementById('show-timestamps').checked = config.showTimestamps !== false;
   document.getElementById('show-badges').checked = config.showBadges !== false;
-  document.getElementById('show-mod-vip-highlight').checked = !!config.showModVipHighlight;
+  document.getElementById('show-nameplates').checked = config.showNameplates !== false;
+  document.getElementById('nameplate-normal').checked = config.nameplateNormal !== false;
+  document.getElementById('nameplate-mod').checked = config.nameplateMod !== false;
+  document.getElementById('nameplate-vip').checked = config.nameplateVip !== false;
+  updateNameplateSuboptions();
   document.getElementById('show-reply-threads').checked = config.showReplyThreads !== false;
   document.getElementById('show-shared-chat').checked = config.showSharedChat !== false;
   document.getElementById('show-shared-avatars').checked = config.showSharedChatAvatars !== false;
@@ -284,7 +288,10 @@ document.getElementById('save-btn').addEventListener('click', async () => {
     textShadow: fieldEl('text-shadow', CANONICAL_PLATFORM).checked,
     shadowOpacity: parseInt(fieldEl('shadow-opacity', CANONICAL_PLATFORM).value, 10) / 100,
     showBadges: document.getElementById('show-badges').checked,
-    showModVipHighlight: document.getElementById('show-mod-vip-highlight').checked,
+    showNameplates: document.getElementById('show-nameplates').checked,
+    nameplateNormal: document.getElementById('nameplate-normal').checked,
+    nameplateMod: document.getElementById('nameplate-mod').checked,
+    nameplateVip: document.getElementById('nameplate-vip').checked,
     showReplyThreads: document.getElementById('show-reply-threads').checked,
     showSharedChat: document.getElementById('show-shared-chat').checked,
     showSharedChatAvatars: document.getElementById('show-shared-avatars').checked,
@@ -654,3 +661,11 @@ PLATFORMS.forEach(platform => {
     toggle.classList.toggle('open', !isOpen);
   });
 })();
+
+function updateNameplateSuboptions() {
+  const enabled = document.getElementById('show-nameplates').checked;
+  const sub = document.getElementById('nameplate-suboptions');
+  if (sub) sub.style.display = enabled ? 'block' : 'none';
+}
+
+document.getElementById('show-nameplates').addEventListener('change', updateNameplateSuboptions);
