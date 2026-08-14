@@ -34,7 +34,7 @@ function isGoogleFont(name) {
 function quoteFontName(name) {
   if (!name) return 'system-ui';
   if (/^[a-zA-Z0-9-]+$/.test(name)) return name;
-  return `'${String(name).replace(/'/g, "\\'")}'`;
+  return `'${String(name).replace(/\\/g, "\\\\").replace(/'/g, "\\'")}'`;
 }
 
 function fontFamilyCss(name) {
