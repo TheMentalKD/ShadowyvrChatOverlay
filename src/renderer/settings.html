@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'" />
   <title>Shadowyvr Chat Overlay — Settings</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="settings-page">
   <div class="settings-container">
     <div class="settings-title">Shadowyvr Chat Overlay</div>
-    <p class="hint" style="margin-top:-12px">Settings are saved automatically when you click Save.</p>
+    <p class="hint mt-neg-12">Settings are saved automatically when you click Save.</p>
 
     <div class="platform-tabs">
       <button class="platform-btn active" data-platform="twitch">Twitch</button>
@@ -34,37 +35,43 @@
             <button class="auth-btn auth-btn-secondary" id="logout-btn" type="button">Log out</button>
           </div>
 
-          <div class="toggle-row" style="margin-top:12px">
-            <span>Show chat input during click-through</span>
-            <label class="toggle">
-              <input type="checkbox" id="show-chat-input" />
-              <span class="slider"></span>
+          <div class="toggle-row mt-12">
+            <label class="toggle-row-control">
+              <span>Show chat input during click-through</span>
+              <span class="toggle">
+                <input type="checkbox" id="show-chat-input" />
+                <span class="slider"></span>
+              </span>
             </label>
           </div>
           <span class="hint">Chat input is always visible when click-through is off. Enable this to keep it visible when click-through is active.</span>
         </div>
 
-        <div class="field" id="field-twitch" style="margin-top:12px">
-          <label>Twitch channel name</label>
+        <div class="field mt-12" id="field-twitch">
+          <label for="twitch-channel">Twitch channel name</label>
           <input type="text" id="twitch-channel" placeholder="yourchannelname" />
           <span class="hint">The channel whose chat you want to monitor — log in above to also send messages</span>
         </div>
 
-        <div style="margin-top:12px; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px">
+        <div class="section-divider">
           <div class="toggle-row">
-            <span>Show shared chat messages</span>
-            <label class="toggle">
-              <input type="checkbox" id="show-shared-chat" checked />
-              <span class="slider"></span>
+            <label class="toggle-row-control">
+              <span>Show shared chat messages</span>
+              <span class="toggle">
+                <input type="checkbox" id="show-shared-chat" checked />
+                <span class="slider"></span>
+              </span>
             </label>
           </div>
 
-          <div id="shared-chat-sub" style="margin-left:16px; border-left:2px solid rgba(255,255,255,0.08); padding-left:14px;">
+          <div id="shared-chat-sub">
             <div class="toggle-row">
-              <span>Show channel avatars</span>
-              <label class="toggle">
-                <input type="checkbox" id="show-shared-avatars" checked />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Show channel avatars</span>
+                <span class="toggle">
+                  <input type="checkbox" id="show-shared-avatars" checked />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
           </div>
@@ -73,29 +80,29 @@
 
       <div class="settings-section appearance-section">
         <h3>Appearance</h3>
-        <p class="hint" style="margin-top:-8px">These settings apply to Twitch, YouTube and Kick chat together.</p>
+        <p class="hint mt-neg-8">These settings apply to Twitch, YouTube and Kick chat together.</p>
 
         <div class="field-row">
           <div class="field">
-            <label>Font size (px)</label>
+            <label for="font-size-twitch">Font size (px)</label>
             <input type="number" data-base="font-size" id="font-size-twitch" min="10" max="28" value="14" />
           </div>
           <div class="field">
-            <label>Max messages</label>
+            <label for="max-messages-twitch">Max messages</label>
             <input type="number" data-base="max-messages" id="max-messages-twitch" min="20" max="500" value="100" />
           </div>
         </div>
 
         <div class="field">
-          <label>Font</label>
-          <input type="search" data-base="font-search" id="font-search-twitch" placeholder="Search open-source or local fonts…" />
+          <label for="font-family-twitch">Font</label>
+          <input type="search" data-base="font-search" id="font-search-twitch" placeholder="Search open-source or local fonts…" aria-label="Search fonts" />
           <select data-base="font-family" id="font-family-twitch" size="8"></select>
           <span class="hint">Open-source fonts load from Google Fonts; local fonts are installed on this PC</span>
           <p data-base="font-preview" id="font-preview-twitch" class="font-preview">The quick brown fox jumps over the lazy dog 0123456789</p>
         </div>
 
         <div class="field">
-          <label>Fade messages after (seconds)</label>
+          <label for="message-fade-twitch">Fade messages after (seconds)</label>
           <input type="number" data-base="message-fade" id="message-fade-twitch" min="0" step="1" value="0" placeholder="0" />
           <span class="hint">Type any number of seconds — 0 means never fade</span>
         </div>
@@ -108,7 +115,7 @@
           </button>
           <div class="color-section-body" data-base="bg-section-body" id="bg-section-body-twitch" hidden>
             <div class="field">
-              <label>Background colour</label>
+              <label for="bg-color-twitch">Background colour</label>
               <div class="color-field-wrap" data-base="bg-color-wrap" id="bg-color-wrap-twitch">
                 <div class="color-preview-row">
                   <input type="text" data-base="bg-color" id="bg-color-twitch" placeholder="rgba(0,0,0,0.45)" class="color-text-input" />
@@ -118,11 +125,11 @@
                   <canvas class="color-canvas" data-base="bg-canvas" id="bg-canvas-twitch" width="220" height="140"></canvas>
                   <div class="picker-cursor" data-base="bg-cursor" id="bg-cursor-twitch"></div>
                   <div class="hue-row">
-                    <label class="picker-label">Hue</label>
+                    <label class="picker-label" for="bg-hue-twitch">Hue</label>
                     <input type="range" class="hue-slider" data-base="bg-hue" id="bg-hue-twitch" min="0" max="360" value="0" />
                   </div>
                   <div class="hue-row">
-                    <label class="picker-label">Opacity</label>
+                    <label class="picker-label" for="bg-alpha-twitch">Opacity</label>
                     <input type="range" class="opacity-picker-slider" data-base="bg-alpha" id="bg-alpha-twitch" min="0" max="100" value="45" />
                   </div>
                   <div class="format-toggle-row">
@@ -133,7 +140,7 @@
               </div>
             </div>
             <div class="field">
-              <label>Background opacity <span data-base="opacity-val" id="opacity-val-twitch">90%</span></label>
+              <label for="opacity-twitch">Background opacity <span data-base="opacity-val" id="opacity-val-twitch">90%</span></label>
               <input type="range" data-base="opacity" id="opacity-twitch" min="10" max="100" value="90" />
             </div>
           </div>
@@ -147,7 +154,7 @@
           </button>
           <div class="color-section-body" data-base="text-section-body" id="text-section-body-twitch" hidden>
             <div class="field">
-              <label>Text colour</label>
+              <label for="text-color-twitch">Text colour</label>
               <div class="color-field-wrap" data-base="text-color-wrap" id="text-color-wrap-twitch">
                 <div class="color-preview-row">
                   <input type="text" data-base="text-color" id="text-color-twitch" placeholder="#ffffff" class="color-text-input" />
@@ -157,11 +164,11 @@
                   <canvas class="color-canvas" data-base="text-canvas" id="text-canvas-twitch" width="220" height="140"></canvas>
                   <div class="picker-cursor" data-base="text-cursor" id="text-cursor-twitch"></div>
                   <div class="hue-row">
-                    <label class="picker-label">Hue</label>
+                    <label class="picker-label" for="text-hue-twitch">Hue</label>
                     <input type="range" class="hue-slider" data-base="text-hue" id="text-hue-twitch" min="0" max="360" value="0" />
                   </div>
                   <div class="hue-row">
-                    <label class="picker-label">Opacity</label>
+                    <label class="picker-label" for="text-alpha-twitch">Opacity</label>
                     <input type="range" class="opacity-picker-slider" data-base="text-alpha" id="text-alpha-twitch" min="0" max="100" value="100" />
                   </div>
                   <div class="format-toggle-row">
@@ -173,25 +180,29 @@
 
             </div>
             <div class="toggle-row">
-              <span>Text shadow</span>
-              <label class="toggle">
-                <input type="checkbox" data-base="text-shadow" id="text-shadow-twitch" />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Text shadow</span>
+                <span class="toggle">
+                  <input type="checkbox" data-base="text-shadow" id="text-shadow-twitch" />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
             <div class="field" data-base="shadow-opacity-field" id="shadow-opacity-field-twitch">
-              <label>Shadow opacity <span data-base="shadow-opacity-val" id="shadow-opacity-val-twitch">90%</span></label>
+              <label for="shadow-opacity-twitch">Shadow opacity <span data-base="shadow-opacity-val" id="shadow-opacity-val-twitch">90%</span></label>
               <input type="range" data-base="shadow-opacity" id="shadow-opacity-twitch" min="0" max="100" value="90" />
             </div>
             <div class="toggle-row">
-              <span>Text background</span>
-              <label class="toggle">
-                <input type="checkbox" data-base="text-background" id="text-background-twitch" />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Text background</span>
+                <span class="toggle">
+                  <input type="checkbox" data-base="text-background" id="text-background-twitch" />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
             <div class="field" data-base="text-background-opacity-field" id="text-background-opacity-field-twitch">
-              <label>Background opacity <span data-base="text-background-opacity-val" id="text-background-opacity-val-twitch">50%</span></label>
+              <label for="text-background-opacity-twitch">Background opacity <span data-base="text-background-opacity-val" id="text-background-opacity-val-twitch">50%</span></label>
               <input type="range" data-base="text-background-opacity" id="text-background-opacity-twitch" min="0" max="100" value="50" />
             </div>
           </div>
@@ -208,48 +219,58 @@
             <span class="color-section-arrow">▾</span>
           </button>
           <div class="color-section-body" id="events-section-body" hidden>
-            <p class="hint" style="margin:0 0 8px">Show alerts for Twitch channel events. Useful if you don't use a bot like Wizebot or StreamElements.</p>
+            <p class="hint mb-8">Show alerts for Twitch channel events. Useful if you don't use a bot like Wizebot or StreamElements.</p>
 
             <div class="toggle-row">
-              <span>Subscriptions</span>
-              <label class="toggle">
-                <input type="checkbox" id="event-subs" checked />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Subscriptions</span>
+                <span class="toggle">
+                  <input type="checkbox" id="event-subs" checked />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
 
             <div class="toggle-row">
-              <span>Gifted subscriptions</span>
-              <label class="toggle">
-                <input type="checkbox" id="event-subgifts" checked />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Gifted subscriptions</span>
+                <span class="toggle">
+                  <input type="checkbox" id="event-subgifts" checked />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
 
             <div class="toggle-row">
-              <span>Raids</span>
-              <label class="toggle">
-                <input type="checkbox" id="event-raids" checked />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Raids</span>
+                <span class="toggle">
+                  <input type="checkbox" id="event-raids" checked />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
 
             <div class="toggle-row">
-              <span>Cheers / Bits</span>
-              <label class="toggle">
-                <input type="checkbox" id="event-cheers" checked />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Cheers / Bits</span>
+                <span class="toggle">
+                  <input type="checkbox" id="event-cheers" checked />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
 
             <div class="toggle-row">
-              <span>Follows</span>
-              <label class="toggle">
-                <input type="checkbox" id="event-follows" />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Follows</span>
+                <span class="toggle">
+                  <input type="checkbox" id="event-follows" />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
-            <span class="hint" style="display:block;margin-top:4px">Follows require the channel owner to be logged in.</span>
+            <span class="hint hint-block">Follows require the channel owner to be logged in.</span>
           </div>
         </div>
 
@@ -259,59 +280,73 @@
         <h3>Chat Options</h3>
 
         <div class="toggle-row">
-          <span>Show timestamps</span>
-          <label class="toggle">
-            <input type="checkbox" id="show-timestamps" checked />
-            <span class="slider"></span>
+          <label class="toggle-row-control">
+            <span>Show timestamps</span>
+            <span class="toggle">
+              <input type="checkbox" id="show-timestamps" checked />
+              <span class="slider"></span>
+            </span>
           </label>
         </div>
 
         <div class="toggle-row">
-          <span>Show Twitch badges</span>
-          <label class="toggle">
-            <input type="checkbox" id="show-badges" checked />
-            <span class="slider"></span>
+          <label class="toggle-row-control">
+            <span>Show Twitch badges</span>
+            <span class="toggle">
+              <input type="checkbox" id="show-badges" checked />
+              <span class="slider"></span>
+            </span>
           </label>
         </div>
 
         <div class="toggle-row">
-          <span>Show nameplates</span>
-          <label class="toggle">
-            <input type="checkbox" id="show-nameplates" checked />
-            <span class="slider"></span>
+          <label class="toggle-row-control">
+            <span>Show nameplates</span>
+            <span class="toggle">
+              <input type="checkbox" id="show-nameplates" checked />
+              <span class="slider"></span>
+            </span>
           </label>
         </div>
         <span class="hint">Shows a colour-coded pill behind each username using their Twitch chat colour.</span>
 
         <div class="filter-sub" id="nameplate-suboptions">
           <div class="toggle-row sub-toggle-row">
-            <span>Normal viewers</span>
-            <label class="toggle toggle-sm">
-              <input type="checkbox" id="nameplate-normal" checked />
-              <span class="slider"></span>
+            <label class="toggle-row-control">
+              <span>Normal viewers</span>
+              <span class="toggle toggle-sm">
+                <input type="checkbox" id="nameplate-normal" checked />
+                <span class="slider"></span>
+              </span>
             </label>
           </div>
           <div class="toggle-row sub-toggle-row">
-            <span>Mods</span>
-            <label class="toggle toggle-sm">
-              <input type="checkbox" id="nameplate-mod" checked />
-              <span class="slider"></span>
+            <label class="toggle-row-control">
+              <span>Mods</span>
+              <span class="toggle toggle-sm">
+                <input type="checkbox" id="nameplate-mod" checked />
+                <span class="slider"></span>
+              </span>
             </label>
           </div>
           <div class="toggle-row sub-toggle-row">
-            <span>VIPs</span>
-            <label class="toggle toggle-sm">
-              <input type="checkbox" id="nameplate-vip" checked />
-              <span class="slider"></span>
+            <label class="toggle-row-control">
+              <span>VIPs</span>
+              <span class="toggle toggle-sm">
+                <input type="checkbox" id="nameplate-vip" checked />
+                <span class="slider"></span>
+              </span>
             </label>
           </div>
         </div>
 
         <div class="toggle-row">
-          <span>Show reply threads</span>
-          <label class="toggle">
-            <input type="checkbox" id="show-reply-threads" checked />
-            <span class="slider"></span>
+          <label class="toggle-row-control">
+            <span>Show reply threads</span>
+            <span class="toggle">
+              <input type="checkbox" id="show-reply-threads" checked />
+              <span class="slider"></span>
+            </span>
           </label>
         </div>
         <span class="hint">Shows which message a reply is responding to, above the reply itself.</span>
@@ -322,29 +357,33 @@
         <h3>Filters</h3>
 
         <div class="toggle-row">
-          <span>Ignore bot messages</span>
-          <label class="toggle">
-            <input type="checkbox" id="filter-bots" checked />
-            <span class="slider"></span>
+          <label class="toggle-row-control">
+            <span>Ignore bot messages</span>
+            <span class="toggle">
+              <input type="checkbox" id="filter-bots" checked />
+              <span class="slider"></span>
+            </span>
           </label>
         </div>
 
         <div id="filter-bots-sub" class="filter-sub">
-          <label>Ignored bots <span class="hint">(space or comma separated)</span></label>
+          <label for="ignored-bots">Ignored bots <span class="hint">(space or comma separated)</span></label>
           <textarea id="ignored-bots" rows="2" placeholder="Nightbot StreamElements Moobot…"></textarea>
         </div>
 
-        <div class="toggle-row" style="margin-top:10px">
-          <span>Ignore commands</span>
-          <label class="toggle">
-            <input type="checkbox" id="filter-commands" checked />
-            <span class="slider"></span>
+        <div class="toggle-row mt-10">
+          <label class="toggle-row-control">
+            <span>Ignore commands</span>
+            <span class="toggle">
+              <input type="checkbox" id="filter-commands" checked />
+              <span class="slider"></span>
+            </span>
           </label>
         </div>
         <span class="hint">Hides all ! commands (e.g. !so, !sr, !lurk) and Twitch slash commands (/shoutout, /timeout, /ban…)</span>
 
-        <div style="margin-top:10px">
-          <label>Blocked users <span class="hint">(space or comma separated — always hidden)</span></label>
+        <div class="mt-10">
+          <label for="blocked-users">Blocked users <span class="hint">(space or comma separated — always hidden)</span></label>
           <textarea id="blocked-users" rows="2" placeholder="username1 username2…"></textarea>
         </div>
       </div>
@@ -353,24 +392,28 @@
         <h3>Behaviour</h3>
 
         <div class="toggle-row">
-          <span>Click-through (overlay ignores mouse)</span>
-          <label class="toggle">
-            <input type="checkbox" id="click-through" />
-            <span class="slider"></span>
+          <label class="toggle-row-control">
+            <span>Click-through (overlay ignores mouse)</span>
+            <span class="toggle">
+              <input type="checkbox" id="click-through" />
+              <span class="slider"></span>
+            </span>
           </label>
         </div>
 
         <div class="toggle-row">
-          <span>Hide from screen capture</span>
-          <label class="toggle">
-            <input type="checkbox" id="hide-from-capture" />
-            <span class="slider"></span>
+          <label class="toggle-row-control">
+            <span>Hide from screen capture</span>
+            <span class="toggle">
+              <input type="checkbox" id="hide-from-capture" />
+              <span class="slider"></span>
+            </span>
           </label>
         </div>
         <span class="hint">Overlay stays visible to you, but is excluded from OBS, Discord/Zoom screen share, and screenshots. Not supported on Linux.</span>
 
         <div class="field">
-          <label>Click-through hotkey</label>
+          <label for="toggle-key">Click-through hotkey</label>
           <input type="text" id="toggle-key" placeholder="F9" />
           <span class="hint">Toggles click-through on/off (e.g. F9, Alt+C) — overlay stays visible</span>
         </div>
@@ -382,36 +425,36 @@
       <div class="settings-section">
         <h3>Channel</h3>
         <div class="field">
-          <label>YouTube live video ID</label>
+          <label for="youtube-id">YouTube live video ID</label>
           <input type="text" id="youtube-id" placeholder="dQw4w9WgXcQ" />
           <span class="hint">The part after ?v= in the video URL</span>
         </div>
       </div>
       <div class="settings-section appearance-section">
         <h3>Appearance</h3>
-        <p class="hint" style="margin-top:-8px">These settings apply to Twitch, YouTube and Kick chat together.</p>
+        <p class="hint mt-neg-8">These settings apply to Twitch, YouTube and Kick chat together.</p>
 
         <div class="field-row">
           <div class="field">
-            <label>Font size (px)</label>
+            <label for="font-size-youtube">Font size (px)</label>
             <input type="number" data-base="font-size" id="font-size-youtube" min="10" max="28" value="14" />
           </div>
           <div class="field">
-            <label>Max messages</label>
+            <label for="max-messages-youtube">Max messages</label>
             <input type="number" data-base="max-messages" id="max-messages-youtube" min="20" max="500" value="100" />
           </div>
         </div>
 
         <div class="field">
-          <label>Font</label>
-          <input type="search" data-base="font-search" id="font-search-youtube" placeholder="Search open-source or local fonts…" />
+          <label for="font-family-youtube">Font</label>
+          <input type="search" data-base="font-search" id="font-search-youtube" placeholder="Search open-source or local fonts…" aria-label="Search fonts" />
           <select data-base="font-family" id="font-family-youtube" size="8"></select>
           <span class="hint">Open-source fonts load from Google Fonts; local fonts are installed on this PC</span>
           <p data-base="font-preview" id="font-preview-youtube" class="font-preview">The quick brown fox jumps over the lazy dog 0123456789</p>
         </div>
 
         <div class="field">
-          <label>Fade messages after (seconds)</label>
+          <label for="message-fade-youtube">Fade messages after (seconds)</label>
           <input type="number" data-base="message-fade" id="message-fade-youtube" min="0" step="1" value="0" placeholder="0" />
           <span class="hint">Type any number of seconds — 0 means never fade</span>
         </div>
@@ -424,7 +467,7 @@
           </button>
           <div class="color-section-body" data-base="bg-section-body" id="bg-section-body-youtube" hidden>
             <div class="field">
-              <label>Background colour</label>
+              <label for="bg-color-youtube">Background colour</label>
               <div class="color-field-wrap" data-base="bg-color-wrap" id="bg-color-wrap-youtube">
                 <div class="color-preview-row">
                   <input type="text" data-base="bg-color" id="bg-color-youtube" placeholder="rgba(0,0,0,0.45)" class="color-text-input" />
@@ -434,11 +477,11 @@
                   <canvas class="color-canvas" data-base="bg-canvas" id="bg-canvas-youtube" width="220" height="140"></canvas>
                   <div class="picker-cursor" data-base="bg-cursor" id="bg-cursor-youtube"></div>
                   <div class="hue-row">
-                    <label class="picker-label">Hue</label>
+                    <label class="picker-label" for="bg-hue-youtube">Hue</label>
                     <input type="range" class="hue-slider" data-base="bg-hue" id="bg-hue-youtube" min="0" max="360" value="0" />
                   </div>
                   <div class="hue-row">
-                    <label class="picker-label">Opacity</label>
+                    <label class="picker-label" for="bg-alpha-youtube">Opacity</label>
                     <input type="range" class="opacity-picker-slider" data-base="bg-alpha" id="bg-alpha-youtube" min="0" max="100" value="45" />
                   </div>
                   <div class="format-toggle-row">
@@ -449,7 +492,7 @@
               </div>
             </div>
             <div class="field">
-              <label>Background opacity <span data-base="opacity-val" id="opacity-val-youtube">90%</span></label>
+              <label for="opacity-youtube">Background opacity <span data-base="opacity-val" id="opacity-val-youtube">90%</span></label>
               <input type="range" data-base="opacity" id="opacity-youtube" min="10" max="100" value="90" />
             </div>
           </div>
@@ -463,7 +506,7 @@
           </button>
           <div class="color-section-body" data-base="text-section-body" id="text-section-body-youtube" hidden>
             <div class="field">
-              <label>Text colour</label>
+              <label for="text-color-youtube">Text colour</label>
               <div class="color-field-wrap" data-base="text-color-wrap" id="text-color-wrap-youtube">
                 <div class="color-preview-row">
                   <input type="text" data-base="text-color" id="text-color-youtube" placeholder="#ffffff" class="color-text-input" />
@@ -473,11 +516,11 @@
                   <canvas class="color-canvas" data-base="text-canvas" id="text-canvas-youtube" width="220" height="140"></canvas>
                   <div class="picker-cursor" data-base="text-cursor" id="text-cursor-youtube"></div>
                   <div class="hue-row">
-                    <label class="picker-label">Hue</label>
+                    <label class="picker-label" for="text-hue-youtube">Hue</label>
                     <input type="range" class="hue-slider" data-base="text-hue" id="text-hue-youtube" min="0" max="360" value="0" />
                   </div>
                   <div class="hue-row">
-                    <label class="picker-label">Opacity</label>
+                    <label class="picker-label" for="text-alpha-youtube">Opacity</label>
                     <input type="range" class="opacity-picker-slider" data-base="text-alpha" id="text-alpha-youtube" min="0" max="100" value="100" />
                   </div>
                   <div class="format-toggle-row">
@@ -489,25 +532,29 @@
 
             </div>
             <div class="toggle-row">
-              <span>Text shadow</span>
-              <label class="toggle">
-                <input type="checkbox" data-base="text-shadow" id="text-shadow-youtube" />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Text shadow</span>
+                <span class="toggle">
+                  <input type="checkbox" data-base="text-shadow" id="text-shadow-youtube" />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
             <div class="field" data-base="shadow-opacity-field" id="shadow-opacity-field-youtube">
-              <label>Shadow opacity <span data-base="shadow-opacity-val" id="shadow-opacity-val-youtube">90%</span></label>
+              <label for="shadow-opacity-youtube">Shadow opacity <span data-base="shadow-opacity-val" id="shadow-opacity-val-youtube">90%</span></label>
               <input type="range" data-base="shadow-opacity" id="shadow-opacity-youtube" min="0" max="100" value="90" />
             </div>
             <div class="toggle-row">
-              <span>Text background</span>
-              <label class="toggle">
-                <input type="checkbox" data-base="text-background" id="text-background-youtube" />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Text background</span>
+                <span class="toggle">
+                  <input type="checkbox" data-base="text-background" id="text-background-youtube" />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
             <div class="field" data-base="text-background-opacity-field" id="text-background-opacity-field-youtube">
-              <label>Background opacity <span data-base="text-background-opacity-val" id="text-background-opacity-val-youtube">50%</span></label>
+              <label for="text-background-opacity-youtube">Background opacity <span data-base="text-background-opacity-val" id="text-background-opacity-val-youtube">50%</span></label>
               <input type="range" data-base="text-background-opacity" id="text-background-opacity-youtube" min="0" max="100" value="50" />
             </div>
           </div>
@@ -524,36 +571,36 @@
       <div class="settings-section">
         <h3>Channel</h3>
         <div class="field">
-          <label>Kick chat room ID</label>
+          <label for="kick-channel">Kick chat room ID</label>
           <input type="text" id="kick-channel" placeholder="12345678" />
           <span class="hint">Numeric room ID from your Kick channel page</span>
         </div>
       </div>
       <div class="settings-section appearance-section">
         <h3>Appearance</h3>
-        <p class="hint" style="margin-top:-8px">These settings apply to Twitch, YouTube and Kick chat together.</p>
+        <p class="hint mt-neg-8">These settings apply to Twitch, YouTube and Kick chat together.</p>
 
         <div class="field-row">
           <div class="field">
-            <label>Font size (px)</label>
+            <label for="font-size-kick">Font size (px)</label>
             <input type="number" data-base="font-size" id="font-size-kick" min="10" max="28" value="14" />
           </div>
           <div class="field">
-            <label>Max messages</label>
+            <label for="max-messages-kick">Max messages</label>
             <input type="number" data-base="max-messages" id="max-messages-kick" min="20" max="500" value="100" />
           </div>
         </div>
 
         <div class="field">
-          <label>Font</label>
-          <input type="search" data-base="font-search" id="font-search-kick" placeholder="Search open-source or local fonts…" />
+          <label for="font-family-kick">Font</label>
+          <input type="search" data-base="font-search" id="font-search-kick" placeholder="Search open-source or local fonts…" aria-label="Search fonts" />
           <select data-base="font-family" id="font-family-kick" size="8"></select>
           <span class="hint">Open-source fonts load from Google Fonts; local fonts are installed on this PC</span>
           <p data-base="font-preview" id="font-preview-kick" class="font-preview">The quick brown fox jumps over the lazy dog 0123456789</p>
         </div>
 
         <div class="field">
-          <label>Fade messages after (seconds)</label>
+          <label for="message-fade-kick">Fade messages after (seconds)</label>
           <input type="number" data-base="message-fade" id="message-fade-kick" min="0" step="1" value="0" placeholder="0" />
           <span class="hint">Type any number of seconds — 0 means never fade</span>
         </div>
@@ -566,7 +613,7 @@
           </button>
           <div class="color-section-body" data-base="bg-section-body" id="bg-section-body-kick" hidden>
             <div class="field">
-              <label>Background colour</label>
+              <label for="bg-color-kick">Background colour</label>
               <div class="color-field-wrap" data-base="bg-color-wrap" id="bg-color-wrap-kick">
                 <div class="color-preview-row">
                   <input type="text" data-base="bg-color" id="bg-color-kick" placeholder="rgba(0,0,0,0.45)" class="color-text-input" />
@@ -576,11 +623,11 @@
                   <canvas class="color-canvas" data-base="bg-canvas" id="bg-canvas-kick" width="220" height="140"></canvas>
                   <div class="picker-cursor" data-base="bg-cursor" id="bg-cursor-kick"></div>
                   <div class="hue-row">
-                    <label class="picker-label">Hue</label>
+                    <label class="picker-label" for="bg-hue-kick">Hue</label>
                     <input type="range" class="hue-slider" data-base="bg-hue" id="bg-hue-kick" min="0" max="360" value="0" />
                   </div>
                   <div class="hue-row">
-                    <label class="picker-label">Opacity</label>
+                    <label class="picker-label" for="bg-alpha-kick">Opacity</label>
                     <input type="range" class="opacity-picker-slider" data-base="bg-alpha" id="bg-alpha-kick" min="0" max="100" value="45" />
                   </div>
                   <div class="format-toggle-row">
@@ -591,7 +638,7 @@
               </div>
             </div>
             <div class="field">
-              <label>Background opacity <span data-base="opacity-val" id="opacity-val-kick">90%</span></label>
+              <label for="opacity-kick">Background opacity <span data-base="opacity-val" id="opacity-val-kick">90%</span></label>
               <input type="range" data-base="opacity" id="opacity-kick" min="10" max="100" value="90" />
             </div>
           </div>
@@ -605,7 +652,7 @@
           </button>
           <div class="color-section-body" data-base="text-section-body" id="text-section-body-kick" hidden>
             <div class="field">
-              <label>Text colour</label>
+              <label for="text-color-kick">Text colour</label>
               <div class="color-field-wrap" data-base="text-color-wrap" id="text-color-wrap-kick">
                 <div class="color-preview-row">
                   <input type="text" data-base="text-color" id="text-color-kick" placeholder="#ffffff" class="color-text-input" />
@@ -615,11 +662,11 @@
                   <canvas class="color-canvas" data-base="text-canvas" id="text-canvas-kick" width="220" height="140"></canvas>
                   <div class="picker-cursor" data-base="text-cursor" id="text-cursor-kick"></div>
                   <div class="hue-row">
-                    <label class="picker-label">Hue</label>
+                    <label class="picker-label" for="text-hue-kick">Hue</label>
                     <input type="range" class="hue-slider" data-base="text-hue" id="text-hue-kick" min="0" max="360" value="0" />
                   </div>
                   <div class="hue-row">
-                    <label class="picker-label">Opacity</label>
+                    <label class="picker-label" for="text-alpha-kick">Opacity</label>
                     <input type="range" class="opacity-picker-slider" data-base="text-alpha" id="text-alpha-kick" min="0" max="100" value="100" />
                   </div>
                   <div class="format-toggle-row">
@@ -631,25 +678,29 @@
 
             </div>
             <div class="toggle-row">
-              <span>Text shadow</span>
-              <label class="toggle">
-                <input type="checkbox" data-base="text-shadow" id="text-shadow-kick" />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Text shadow</span>
+                <span class="toggle">
+                  <input type="checkbox" data-base="text-shadow" id="text-shadow-kick" />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
             <div class="field" data-base="shadow-opacity-field" id="shadow-opacity-field-kick">
-              <label>Shadow opacity <span data-base="shadow-opacity-val" id="shadow-opacity-val-kick">90%</span></label>
+              <label for="shadow-opacity-kick">Shadow opacity <span data-base="shadow-opacity-val" id="shadow-opacity-val-kick">90%</span></label>
               <input type="range" data-base="shadow-opacity" id="shadow-opacity-kick" min="0" max="100" value="90" />
             </div>
             <div class="toggle-row">
-              <span>Text background</span>
-              <label class="toggle">
-                <input type="checkbox" data-base="text-background" id="text-background-kick" />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Text background</span>
+                <span class="toggle">
+                  <input type="checkbox" data-base="text-background" id="text-background-kick" />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
             <div class="field" data-base="text-background-opacity-field" id="text-background-opacity-field-kick">
-              <label>Background opacity <span data-base="text-background-opacity-val" id="text-background-opacity-val-kick">50%</span></label>
+              <label for="text-background-opacity-kick">Background opacity <span data-base="text-background-opacity-val" id="text-background-opacity-val-kick">50%</span></label>
               <input type="range" data-base="text-background-opacity" id="text-background-opacity-kick" min="0" max="100" value="50" />
             </div>
           </div>

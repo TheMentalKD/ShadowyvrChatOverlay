@@ -1,0 +1,32 @@
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      # Electron major bumps carry Chromium security fixes and are worth
+      # reviewing on their own, separate from routine tooling churn.
+      dev-tooling:
+        dependency-type: development
+        patterns: ['*']
+        exclude-patterns: ['electron']
+        update-types: ['minor', 'patch']
+      runtime:
+        dependency-type: production
+        patterns: ['*']
+        update-types: ['minor', 'patch']
+    labels:
+      - dependencies
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    labels:
+      - dependencies
+      - github-actions

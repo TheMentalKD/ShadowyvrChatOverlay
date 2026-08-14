@@ -1,0 +1,114 @@
+name: Release
+
+# Two ways to cut a release:
+#
+#  1. Manual version control — bump yourself, then push a tag:
+#       npm version patch
+#       git push --follow-tags
+#
+#  2. Automatic — go to Actions -> Release -> Run workflow, pick a bump size.
+#     The workflow bumps package.json, commits, tags, and publishes in one run.
+#
+# electron-builder uploads to the repo named in package.json -> build.publish,
+# and bakes that same repo into app-update.yml so the shipped app knows where to
+# look for updates. The preflight step below fails loudly if that config points
+# somewhere other than the repository this workflow is running in — otherwise
+# the upload fails late, or worse, succeeds while pointing users at the wrong
+# update channel.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version bump
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build & publish Windows installer
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # See ci.yml for why --ignore-scripts is safe here: nothing in this dependency tree
+      # needs an install-time lifecycle script to function.
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      # Only runs for the "Run workflow" button path. Uses the default GITHUB_TOKEN
+      # (via actions/checkout's persisted credentials), and GitHub does not trigger a
+      # new workflow run from a push made with that token — so this does not cause the
+      # `push: tags: v*` trigger above to fire a second, duplicate release job.
+      - name: Bump version, commit, and tag
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          npm version "${{ inputs.bump }}" -m "chore(release): v%s"
+          git push origin HEAD --follow-tags
+
+      - name: Preflight — publish target matches this repository
+        shell: bash
+        run: |
+          set -e
+          owner=$(node -p "require('./package.json').build.publish.owner")
+          repo=$(node -p "require('./package.json').build.publish.repo")
+          echo "package.json publishes to: $owner/$repo"
+          echo "workflow is running in:     $GITHUB_REPOSITORY"
+          if [ "$owner/$repo" != "$GITHUB_REPOSITORY" ]; then
+            echo "::error::package.json build.publish points at $owner/$repo but this workflow runs in $GITHUB_REPOSITORY. GITHUB_TOKEN cannot publish to another repository, and the built app would check the wrong repo for updates. Update build.publish in package.json."
+            exit 1
+          fi
+
+      - name: Preflight — tag matches package.json version
+        shell: bash
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          set -e
+          version=$(node -p "require('./package.json').version")
+          tag="${GITHUB_REF_NAME#v}"
+          if [ "$version" != "$tag" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $version."
+            exit 1
+          fi
+
+      - name: Build and publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx electron-builder --win --publish always
+
+      # github.ref_name is the branch name ("main") on the workflow_dispatch path, not the
+      # tag that was just pushed, so read the real version straight out of package.json.
+      - name: Read package version
+        id: pkg
+        shell: bash
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Upload installer as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: shadowyvr-chat-overlay-v${{ steps.pkg.outputs.version }}
+          path: |
+            release/*.exe
+            release/latest.yml
+          if-no-files-found: error

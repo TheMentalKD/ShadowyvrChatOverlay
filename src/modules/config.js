@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 const { app } = require('electron');
 
 const CONFIG_PATH = path.join(app.getPath('userData'), 'config.json');
@@ -63,7 +63,7 @@ function loadConfig() {
       delete parsed.twitchAuth;
       const merged = { ...DEFAULT_CONFIG, ...parsed };
       if (typeof merged.fontFamily === 'string' && merged.fontFamily.includes(',')) {
-        merged.fontFamily = merged.fontFamily.split(',')[0].replace(/['\"]/g, '').trim();
+        merged.fontFamily = merged.fontFamily.split(',')[0].replace(/['"]/g, '').trim();
       }
       if (!merged.fontSource) merged.fontSource = 'google';
       merged.twitchAuthToken = null;

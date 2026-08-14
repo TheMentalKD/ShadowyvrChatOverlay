@@ -1,6 +1,6 @@
 const { app, ipcMain, globalShortcut, screen, session, shell } = require('electron');
-const path = require('path');
-const fs = require('fs');
+const path = require('node:path');
+const fs = require('node:fs');
 
 app.setPath('userData', path.join(app.getPath('appData'), 'Shadowyvr Chat Overlay'));
 fs.mkdirSync(app.getPath('userData'), { recursive: true });
@@ -82,7 +82,10 @@ app.whenReady().then(() => {
   windowModule.createMainWindow(twitchModule.connectTwitch);
   trayModule.createTray(updaterModule.isUpdateReady(), require('electron-updater').autoUpdater);
   windowModule.startLayeringInterval();
-  if (app.isPackaged) updaterModule.setupAutoUpdater();
+  if (app.isPackaged) {
+    updaterModule.setupAutoUpdater();
+    updaterModule.scheduleAutomaticChecks(windowModule.sendToOverlay);
+  }
 
   try {
     globalShortcut.register(config.toggleKey, toggleClickThrough);
@@ -93,11 +96,15 @@ app.whenReady().then(() => {
 
 app.on('second-instance', () => {
   const win = windowModule.getMainWindow();
-  if (win) { if (win.isMinimized()) win.restore(); win.focus(); }
+  if (win) {
+    if (win.isMinimized()) win.restore();
+    win.focus();
+  }
 });
 
 app.on('will-quit', () => {
   windowModule.stopLayeringInterval();
+  updaterModule.stopAutomaticChecks();
   globalShortcut.unregisterAll();
   trayModule.destroyTray();
 });
@@ -123,7 +130,10 @@ ipcMain.handle('save-config', async (_event, newConfig) => {
   }
 
   const previousChannel = config.channel;
-  const { twitchConnected: _tc, twitchAuthToken: _tok, twitchAuthUser: _user, ...safeConfig } = newConfig;
+  const safeConfig = { ...newConfig };
+  delete safeConfig.twitchConnected;
+  delete safeConfig.twitchAuthToken;
+  delete safeConfig.twitchAuthUser;
   config = { ...config, ...safeConfig };
   delete config.twitchClientId;
   delete config.twitchAuth;
@@ -198,11 +208,22 @@ ipcMain.on('stop-resizing', () => {});
 ipcMain.handle('get-version', () => app.getVersion());
 
 ipcMain.handle('open-external', (_e, url) => {
-  const allowed = ['https://ko-fi.com', 'https://github.com'];
-  if (allowed.some(prefix => url.startsWith(prefix))) shell.openExternal(url);
+  // A prefix check here (url.startsWith('https://ko-fi.com')) would accept
+  // 'https://ko-fi.com.evil.example/...' — parse it and check the actual
+  // hostname instead.
+  const allowedHosts = new Set(['ko-fi.com', 'github.com']);
+  let parsed;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return;
+  }
+  if (parsed.protocol === 'https:' && allowedHosts.has(parsed.hostname)) {
+    shell.openExternal(parsed.href);
+  }
 });
 
-ipcMain.handle('check-for-update', () => updaterModule.checkForUpdate(windowModule.sendToOverlay));
+ipcMain.handle('check-for-update', () => updaterModule.checkForUpdate(windowModule.sendToOverlay, { manual: true }));
 ipcMain.handle('download-update',  () => updaterModule.downloadUpdate(windowModule.sendToOverlay));
 ipcMain.handle('install-update',   () => updaterModule.installUpdate());
 

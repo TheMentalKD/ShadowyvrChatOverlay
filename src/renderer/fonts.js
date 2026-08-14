@@ -1,3 +1,6 @@
+/* exported getLocalFontFamilies, applyChatFont */
+// Loaded as a classic <script> before chat.js and settings.js, which call
+// these directly as globals — see index.html / settings.html load order.
 
 const GOOGLE_FONTS = [
   'Inter', 'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Poppins',
@@ -28,10 +31,15 @@ function isGoogleFont(name) {
   return GOOGLE_FONT_SET.has(name);
 }
 
+// Pulled out of quoteFontName() to avoid nesting these template literals inside the one it
+// builds below — same escaped-backslash and escaped-quote replacements, just declared once.
+const ESCAPED_BACKSLASH = String.raw`\\`;
+const ESCAPED_QUOTE = String.raw`\'`;
+
 function quoteFontName(name) {
   if (!name) return 'system-ui';
   if (/^[a-zA-Z0-9-]+$/.test(name)) return name;
-  return `'${String(name).replace(/'/g, "\\'")}'`;
+  return `'${String(name).replaceAll('\\', ESCAPED_BACKSLASH).replaceAll("'", ESCAPED_QUOTE)}'`;
 }
 
 function fontFamilyCss(name) {
@@ -39,7 +47,7 @@ function fontFamilyCss(name) {
 }
 
 function googleFontsStylesheetUrl(family) {
-  const q = encodeURIComponent(family).replace(/%20/g, '+');
+  const q = encodeURIComponent(family).replaceAll('%20', '+');
   return `https://fonts.googleapis.com/css2?family=${q}:wght@400;500;600;700&display=swap`;
 }
 

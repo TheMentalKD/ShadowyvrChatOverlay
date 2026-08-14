@@ -1,5 +1,15 @@
 const { BrowserWindow, app } = require('electron');
-const path = require('path');
+const path = require('node:path');
+
+// electron-builder's build.win.icon (package.json) sets the icon baked into the packaged .exe
+// and installer, but that's a separate setting from what each BrowserWindow shows in its title
+// bar and taskbar entry — without this, every window falls back to Electron's default icon,
+// which is most obvious in dev (`npm start`, no packaged .exe to inherit from at all).
+function resolveIconPath() {
+  return app.isPackaged
+    ? path.join(process.resourcesPath, 'assets', 'icon.ico')
+    : path.join(__dirname, '..', '..', 'assets', 'icon.ico');
+}
 
 let mainWindow = null;
 let settingsWindow = null;
@@ -38,6 +48,7 @@ function createMainWindow(connectTwitch) {
     y: config.position.y,
     width: config.size.width,
     height: config.size.height,
+    icon: resolveIconPath(),
     transparent: true,
     frame: false,
     alwaysOnTop: true,
@@ -110,6 +121,7 @@ function createSettingsWindow() {
     width: 480,
     height: 720,
     title: 'Shadowyvr Chat Overlay — Settings',
+    icon: resolveIconPath(),
     resizable: true,
     parent: mainWindow,
     alwaysOnTop: true,
@@ -134,6 +146,7 @@ function createAboutWindow() {
     width: 340,
     height: 270,
     title: 'About Shadowyvr Chat Overlay',
+    icon: resolveIconPath(),
     resizable: false,
     minimizable: false,
     maximizable: false,
@@ -147,7 +160,11 @@ function createAboutWindow() {
   });
 
   const version = app.getVersion();
+  // Entirely author-controlled markup (no external or user input reaches this string), but it
+  // still ships an inline <script> and <style>, so give it the same defense-in-depth CSP as the
+  // other windows rather than leaving it as the one unprotected surface.
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'none'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <style>
   body { font-family: system-ui, sans-serif; background: #141414; color: #ccc; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; gap: 8px; user-select: none; }
   h2 { color: #fff; margin: 0; font-size: 18px; }
