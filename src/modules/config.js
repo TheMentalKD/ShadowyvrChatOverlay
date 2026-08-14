@@ -1,6 +1,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { app } = require('electron');
+const { app, safeStorage } = require('electron');
 
 const CONFIG_PATH = path.join(app.getPath('userData'), 'config.json');
 
@@ -61,11 +61,14 @@ function loadConfig() {
       const parsed = JSON.parse(raw);
       delete parsed.twitchClientId;
       delete parsed.twitchAuth;
+      delete parsed.twitchAuthTokenEnc;
       const merged = { ...DEFAULT_CONFIG, ...parsed };
       if (typeof merged.fontFamily === 'string' && merged.fontFamily.includes(',')) {
         merged.fontFamily = merged.fontFamily.split(',')[0].replace(/['"]/g, '').trim();
       }
       if (!merged.fontSource) merged.fontSource = 'google';
+      // The encrypted token can only be decrypted once safeStorage is available
+      // (after app 'ready'), so auth is restored separately via restoreAuth().
       merged.twitchAuthToken = null;
       merged.twitchAuthUser = null;
       return merged;
@@ -74,11 +77,30 @@ function loadConfig() {
   return { ...DEFAULT_CONFIG };
 }
 
+// Must be called after app.whenReady() — safeStorage.isEncryptionAvailable()
+// is false (Windows/Linux) prior to that. Mutates and returns `config`.
+function restoreAuth(config) {
+  try {
+    if (!fs.existsSync(CONFIG_PATH)) return config;
+    const parsed = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf-8'));
+    if (parsed.twitchAuthTokenEnc && safeStorage.isEncryptionAvailable()) {
+      config.twitchAuthToken = safeStorage.decryptString(Buffer.from(parsed.twitchAuthTokenEnc, 'base64'));
+      config.twitchAuthUser = parsed.twitchAuthUser || null;
+    }
+  } catch {}
+  return config;
+}
+
 function saveConfig(config) {
   const out = { ...config };
   delete out.twitchAuthToken;
-  delete out.twitchAuthUser;
+  if (config.twitchAuthToken && safeStorage.isEncryptionAvailable()) {
+    out.twitchAuthTokenEnc = safeStorage.encryptString(config.twitchAuthToken).toString('base64');
+  } else {
+    delete out.twitchAuthTokenEnc;
+    delete out.twitchAuthUser;
+  }
   fs.writeFileSync(CONFIG_PATH, JSON.stringify(out, null, 2));
 }
 
-module.exports = { DEFAULT_CONFIG, loadConfig, saveConfig };
+module.exports = { DEFAULT_CONFIG, loadConfig, saveConfig, restoreAuth };
