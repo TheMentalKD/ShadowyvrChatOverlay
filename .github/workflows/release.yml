@@ -40,6 +40,14 @@ jobs:
   release:
     name: Build & publish Windows installer
     runs-on: windows-latest
+    # Guards against this workflow triggering itself twice for the same version. The
+    # "Bump version, commit, and tag" step below pushes a new tag from inside a
+    # workflow_dispatch run, and that push can also satisfy the `push: tags: v*` trigger
+    # above — spawning a second, redundant run that builds and publishes the identical
+    # version a second time. Skip any push-triggered run whose tag points at a commit this
+    # workflow generated itself (recognizable by its own commit message prefix); a manual
+    # release (option 1 above) never produces that prefix, so it's unaffected.
+    if: github.event_name != 'push' || !startsWith(github.event.head_commit.message, 'chore(release):')
     steps:
       - uses: actions/checkout@v4
 
@@ -53,10 +61,8 @@ jobs:
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
-      # Only runs for the "Run workflow" button path. Uses the default GITHUB_TOKEN
-      # (via actions/checkout's persisted credentials), and GitHub does not trigger a
-      # new workflow run from a push made with that token — so this does not cause the
-      # `push: tags: v*` trigger above to fire a second, duplicate release job.
+      # Only runs for the "Run workflow" button path. The job-level `if:` above is what
+      # actually stops the tag pushed here from spawning a second run of this workflow.
       - name: Bump version, commit, and tag
         if: github.event_name == 'workflow_dispatch'
         shell: bash
@@ -92,17 +98,30 @@ jobs:
             exit 1
           fi
 
-      - name: Build and publish
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx electron-builder --win --publish always
-
-      # github.ref_name is the branch name ("main") on the workflow_dispatch path, not the
-      # tag that was just pushed, so read the real version straight out of package.json.
+      # github.ref_name is the branch name ("main") on the workflow_dispatch path, not the tag
+      # that was just pushed — read the real version straight out of package.json instead, and
+      # do it before publishing so the next step can correct electron-builder's view of the ref.
       - name: Read package version
         id: pkg
         shell: bash
         run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      # electron-builder decides which GitHub release to create/update from the GITHUB_REF*
+      # environment variables GitHub Actions sets — see getCiTag() in electron-publish
+      # (electron-userland/electron-builder PR #7231). Those are fixed to whatever triggered the
+      # run and never update mid-job: on the workflow_dispatch path they still say
+      # refs/heads/main even after the bump step above pushes a brand-new tag, so
+      # electron-builder looks for a release tagged "main", fails to find (or correctly create)
+      # one, and creates a stray duplicate instead of reusing the real one. Override them for
+      # just this step so electron-builder sees the tag we actually just created. The
+      # push-triggered path already has the correct values, so this passes them through as-is.
+      - name: Build and publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REF: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/v{0}', steps.pkg.outputs.version) || github.ref }}
+          GITHUB_REF_NAME: ${{ github.event_name == 'workflow_dispatch' && format('v{0}', steps.pkg.outputs.version) || github.ref_name }}
+          GITHUB_REF_TYPE: ${{ github.event_name == 'workflow_dispatch' && 'tag' || github.ref_type }}
+        run: npx electron-builder --win --publish always
 
       - name: Upload installer as workflow artifact
         uses: actions/upload-artifact@v4
