@@ -1424,7 +1424,7 @@ body.settings-page .settings-container {
   padding-left: 14px;
 }
 
-.filter-sub label {
+.filter-sub label:not(.toggle-row-control) {
   display: block;
   font-size: 11px;
   color: #aaa;
