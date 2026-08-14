@@ -75,6 +75,8 @@ const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) app.quit();
 
 app.whenReady().then(() => {
+  config = configModule.restoreAuth(config);
+
   session.defaultSession.setPermissionRequestHandler((_wc, permission, callback) => {
     callback(permission === 'local-fonts');
   });
