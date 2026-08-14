@@ -212,7 +212,12 @@ updateBtn.addEventListener('click', async () => {
   updateBtn.disabled = true;
   updateBtn.style.opacity = '0.5';
   updateBanner.style.display = 'none';
-  await window.electronAPI.checkForUpdate();
+  try {
+    await window.electronAPI.checkForUpdate();
+  } finally {
+    updateBtn.disabled = false;
+    updateBtn.style.opacity = '';
+  }
 });
 
 clickthroughToggleBtn.addEventListener('click', () => {
