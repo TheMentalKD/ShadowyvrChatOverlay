@@ -147,7 +147,11 @@ function createAboutWindow() {
   });
 
   const version = app.getVersion();
+  // Entirely author-controlled markup (no external or user input reaches this string), but it
+  // still ships an inline <script> and <style>, so give it the same defense-in-depth CSP as the
+  // other windows rather than leaving it as the one unprotected surface.
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'none'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <style>
   body { font-family: system-ui, sans-serif; background: #141414; color: #ccc; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; gap: 8px; user-select: none; }
   h2 { color: #fff; margin: 0; font-size: 18px; }

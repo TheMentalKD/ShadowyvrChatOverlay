@@ -3,6 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!--
+    Renderer runs with contextIsolation on and no Node integration, so this CSP is the last line
+    of defense if a chat message or third-party API response ever got treated as markup. Scripts
+    and stylesheets load from disk only; images are allowed from any https: host because emote,
+    badge, and avatar URLs come from Twitch/7TV/BTTV/FFZ CDNs whose exact subdomains rotate.
+  -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'" />
   <title>Shadowyvr Chat Overlay</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -94,8 +101,8 @@
   <div id="update-banner" hidden>
     <span id="update-banner-text"></span>
     <div class="update-banner-actions">
-      <button id="update-download-btn" type="button">Download</button>
-      <button id="update-dismiss-btn" type="button">Dismiss</button>
+      <button id="update-download-btn" type="button">Update Now</button>
+      <button id="update-dismiss-btn" type="button">Later</button>
     </div>
   </div>
   <script src="fonts.js"></script>

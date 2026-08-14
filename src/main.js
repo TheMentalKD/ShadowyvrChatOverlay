@@ -82,7 +82,10 @@ app.whenReady().then(() => {
   windowModule.createMainWindow(twitchModule.connectTwitch);
   trayModule.createTray(updaterModule.isUpdateReady(), require('electron-updater').autoUpdater);
   windowModule.startLayeringInterval();
-  if (app.isPackaged) updaterModule.setupAutoUpdater();
+  if (app.isPackaged) {
+    updaterModule.setupAutoUpdater();
+    updaterModule.scheduleAutomaticChecks(windowModule.sendToOverlay);
+  }
 
   try {
     globalShortcut.register(config.toggleKey, toggleClickThrough);
@@ -98,6 +101,7 @@ app.on('second-instance', () => {
 
 app.on('will-quit', () => {
   windowModule.stopLayeringInterval();
+  updaterModule.stopAutomaticChecks();
   globalShortcut.unregisterAll();
   trayModule.destroyTray();
 });
@@ -202,7 +206,7 @@ ipcMain.handle('open-external', (_e, url) => {
   if (allowed.some(prefix => url.startsWith(prefix))) shell.openExternal(url);
 });
 
-ipcMain.handle('check-for-update', () => updaterModule.checkForUpdate(windowModule.sendToOverlay));
+ipcMain.handle('check-for-update', () => updaterModule.checkForUpdate(windowModule.sendToOverlay, { manual: true }));
 ipcMain.handle('download-update',  () => updaterModule.downloadUpdate(windowModule.sendToOverlay));
 ipcMain.handle('install-update',   () => updaterModule.installUpdate());
 

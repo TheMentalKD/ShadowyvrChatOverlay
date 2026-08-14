@@ -50,7 +50,7 @@ To run from source instead:
 
 ```bash
 npm install
-npm run dev
+npm start
 ```
 
 ## Config file location

@@ -1,3 +1,6 @@
+/* exported getLocalFontFamilies, applyChatFont */
+// Loaded as a classic <script> before chat.js and settings.js, which call
+// these directly as globals — see index.html / settings.html load order.
 
 const GOOGLE_FONTS = [
   'Inter', 'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Poppins',

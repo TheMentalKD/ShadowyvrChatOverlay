@@ -445,7 +445,8 @@ function parseColorToRgba(str) {
 function rgbToHsl(r, g, b) {
   r /= 255; g /= 255; b /= 255;
   const max = Math.max(r, g, b), min = Math.min(r, g, b);
-  let h, s, l = (max + min) / 2;
+  let h, s;
+  const l = (max + min) / 2;
   if (max === min) { h = s = 0; }
   else {
     const d = max - min;

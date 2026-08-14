@@ -60,7 +60,7 @@ function showBanner(text, mode, autoClose) {
   updateState = mode;
 
   if (mode === 'available') {
-    updateDownloadBtn.textContent = 'Download & Install';
+    updateDownloadBtn.textContent = 'Update Now';
     updateDownloadBtn.style.display = 'block';
     updateDownloadBtn.disabled = false;
   } else if (mode === 'downloading') {
@@ -101,7 +101,7 @@ updateDownloadBtn.addEventListener('click', async () => {
 updateDismissBtn.addEventListener('click', dismissBanner);
 
 window.electronAPI.onUpdateAvailable((info) => {
-  showBanner(`Version ${info.version} is available — download and install?`, 'available', false);
+  showBanner(`Version ${info.version} is available.`, 'available', false);
 });
 
 window.electronAPI.onUpdateNotAvailable(() => {
@@ -421,7 +421,7 @@ function scheduleFade(el) {
   el._fadeTimer = timer;
 }
 
-function parseTwitchEmoteTag(emotesTag, text) {
+function parseTwitchEmoteTag(emotesTag) {
   if (!emotesTag) return [];
   const replacements = [];
   const entries = typeof emotesTag === 'string' ? emotesTag : null;
@@ -452,9 +452,7 @@ function parseTwitchEmoteTag(emotesTag, text) {
 function renderMessageText(text, emotesTag, thirdPartyEmotes) {
   const frag = document.createDocumentFragment();
 
-  const twitchReplacements = parseTwitchEmoteTag(emotesTag, text);
-
-  const coveredRanges = twitchReplacements.map(r => [r.start, r.end]);
+  const twitchReplacements = parseTwitchEmoteTag(emotesTag);
 
   const twitchCoveredChars = new Set();
   for (const r of twitchReplacements) {
@@ -471,7 +469,6 @@ function renderMessageText(text, emotesTag, thirdPartyEmotes) {
   const allReplacements = [...twitchReplacements];
 
   if (hasThirdParty) {
-    let idx = 0;
     const wordRe = /\S+/g;
     let m;
     while ((m = wordRe.exec(text)) !== null) {
