@@ -464,6 +464,15 @@ body.text-shadow .message {
      1px  1px 0 rgba(0, 0, 0, var(--shadow-opacity, 0.9));
 }
 
+body.text-background .message {
+  background: rgba(0, 0, 0, var(--text-background-opacity, 0.5));
+  border-radius: 4px;
+}
+
+body.text-background .message:hover {
+  background: rgba(0, 0, 0, var(--text-background-opacity, 0.5));
+}
+
 .message .text {
 }
 

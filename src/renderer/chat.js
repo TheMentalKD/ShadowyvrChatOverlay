@@ -682,6 +682,8 @@ function applyConfig(cfg) {
   if (appEl) appEl.style.opacity = '';
   document.body.classList.toggle('text-shadow', !!cfg.textShadow);
   document.documentElement.style.setProperty('--shadow-opacity', String(cfg.shadowOpacity ?? 0.9));
+  document.body.classList.toggle('text-background', !!cfg.textBackground);
+  document.documentElement.style.setProperty('--text-background-opacity', String(cfg.textBackgroundOpacity ?? 0.5));
 
   if (ctIndicator) {
     ctIndicator.classList.toggle('active', !!cfg.clickThrough);

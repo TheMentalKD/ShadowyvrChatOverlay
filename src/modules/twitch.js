@@ -1,6 +1,6 @@
 const tmi = require('tmi.js');
 const http = require('http');
-const { shell } = require('electron');
+const { BrowserWindow } = require('electron');
 const WebSocketClient = require('ws');
 
 const { fetchGlobalBadges, ensureChannelBadges, resolveBadgeUrls, resolveChannelInfo, roomIdToName, channelBadgeSets } = require('./badges.js');
@@ -395,7 +395,12 @@ function startAuthServer() {
         const token = reqUrl.searchParams.get('access_token');
         const error = reqUrl.searchParams.get('error_description') || reqUrl.searchParams.get('error');
         res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.end(`<html><body style="font-family:sans-serif;text-align:center;margin-top:15%"><h2>${token ? 'Logged in — you can close this tab.' : 'Login failed — you can close this tab.'}</h2></body></html>`);
+        res.end(`<!DOCTYPE html><html><head><script>
+          window.close();
+          setTimeout(function(){ document.getElementById('fallback').style.display = 'block'; }, 1200);
+        </script></head><body style="font-family:sans-serif;text-align:center;margin-top:15%">
+          <div id="fallback" style="display:none"><h2>${token ? 'Logged in — you can close this window.' : 'Login failed — you can close this window.'}</h2></div>
+        </body></html>`);
         closeAuthServer();
         if (token) resolve({ ok: true, token });
         else resolve({ ok: false, error: error || 'No token received' });
@@ -422,10 +427,34 @@ async function doTwitchLogin() {
     `&force_verify=true`;
 
   const authPromise = startAuthServer();
-  shell.openExternal(authUrl).catch(() => { closeAuthServer(); });
 
-  const timeout = new Promise(resolve => setTimeout(() => { closeAuthServer(); resolve({ ok: false, error: 'Login timed out — please try again' }); }, 5 * 60 * 1000));
-  return Promise.race([authPromise, timeout]);
+  const authWindow = new BrowserWindow({
+    width: 500,
+    height: 750,
+    title: 'Shadowyvr Chat Overlay — Twitch Login',
+    autoHideMenuBar: true,
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true
+    }
+  });
+
+  const windowClosedPromise = new Promise(resolve => {
+    authWindow.on('closed', () => resolve({ ok: false, error: 'Login window closed' }));
+  });
+
+  const timeout = new Promise(resolve => {
+    setTimeout(() => resolve({ ok: false, error: 'Login timed out — please try again' }), 5 * 60 * 1000);
+  });
+
+  authWindow.loadURL(authUrl).catch(() => { authWindow.close(); });
+
+  const result = await Promise.race([authPromise, windowClosedPromise, timeout]);
+
+  closeAuthServer();
+  if (!authWindow.isDestroyed()) authWindow.close();
+  return result;
 }
 
 async function fetchTwitchUsername(token) {

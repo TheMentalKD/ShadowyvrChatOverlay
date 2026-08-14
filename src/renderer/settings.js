@@ -87,16 +87,36 @@ function updateShadowOpacityVisibility() {
   });
 }
 
+function updateTextBackgroundOpacityLabels() {
+  PLATFORMS.forEach(p => {
+    const input = fieldEl('text-background-opacity', p);
+    const label = fieldEl('text-background-opacity-val', p);
+    if (input && label) label.textContent = `${input.value}%`;
+  });
+}
+
+function updateTextBackgroundOpacityVisibility() {
+  PLATFORMS.forEach(p => {
+    const checkbox = fieldEl('text-background', p);
+    const field = fieldEl('text-background-opacity-field', p);
+    if (checkbox && field) field.style.display = checkbox.checked ? 'flex' : 'none';
+  });
+}
+
 linkSimpleField('font-size');
 linkSimpleField('max-messages');
 linkSimpleField('message-fade');
 linkSimpleField('opacity', { onAfterSync: updateOpacityLabels });
 linkSimpleField('shadow-opacity', { onAfterSync: updateShadowOpacityLabels });
 linkSimpleField('text-shadow', { onAfterSync: updateShadowOpacityVisibility });
+linkSimpleField('text-background-opacity', { onAfterSync: updateTextBackgroundOpacityLabels });
+linkSimpleField('text-background', { onAfterSync: updateTextBackgroundOpacityVisibility });
 
 updateOpacityLabels();
 updateShadowOpacityLabels();
+updateTextBackgroundOpacityLabels();
 setTimeout(updateShadowOpacityVisibility, 50);
+setTimeout(updateTextBackgroundOpacityVisibility, 50);
 
 function optionValue(source, family) {
   return `${source}::${family}`;
@@ -206,6 +226,8 @@ window.electronAPI.getConfig().then(async (config) => {
     setFieldValue(fieldEl('opacity', p), Math.round((config.opacity || 0.9) * 100));
     setFieldValue(fieldEl('text-shadow', p), !!config.textShadow);
     setFieldValue(fieldEl('shadow-opacity', p), Math.round((config.shadowOpacity ?? 0.9) * 100));
+    setFieldValue(fieldEl('text-background', p), !!config.textBackground);
+    setFieldValue(fieldEl('text-background-opacity', p), Math.round((config.textBackgroundOpacity ?? 0.5) * 100));
     setFieldValue(fieldEl('message-fade', p), config.messageFadeSeconds ?? 0);
     syncSwatchFromInput('bg', p);
     syncSwatchFromInput('text', p);
@@ -214,6 +236,9 @@ window.electronAPI.getConfig().then(async (config) => {
   });
   updateOpacityLabels();
   updateShadowOpacityLabels();
+  updateTextBackgroundOpacityLabels();
+  setTimeout(updateShadowOpacityVisibility, 50);
+  setTimeout(updateTextBackgroundOpacityVisibility, 50);
 
   document.getElementById('show-timestamps').checked = config.showTimestamps !== false;
   document.getElementById('show-badges').checked = config.showBadges !== false;
@@ -287,6 +312,8 @@ document.getElementById('save-btn').addEventListener('click', async () => {
     showTimestamps: document.getElementById('show-timestamps').checked,
     textShadow: fieldEl('text-shadow', CANONICAL_PLATFORM).checked,
     shadowOpacity: parseInt(fieldEl('shadow-opacity', CANONICAL_PLATFORM).value, 10) / 100,
+    textBackground: fieldEl('text-background', CANONICAL_PLATFORM).checked,
+    textBackgroundOpacity: parseInt(fieldEl('text-background-opacity', CANONICAL_PLATFORM).value, 10) / 100,
     showBadges: document.getElementById('show-badges').checked,
     showNameplates: document.getElementById('show-nameplates').checked,
     nameplateNormal: document.getElementById('nameplate-normal').checked,

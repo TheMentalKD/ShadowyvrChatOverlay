@@ -30,6 +30,8 @@ const DEFAULT_CONFIG = {
   messageFadeSeconds: 0,
   textShadow: false,
   shadowOpacity: 0.9,
+  textBackground: false,
+  textBackgroundOpacity: 0.5,
   showBadges: true,
   showModVipHighlight: false,
   showNameplates: true,
@@ -64,6 +66,8 @@ function loadConfig() {
         merged.fontFamily = merged.fontFamily.split(',')[0].replace(/['\"]/g, '').trim();
       }
       if (!merged.fontSource) merged.fontSource = 'google';
+      merged.twitchAuthToken = null;
+      merged.twitchAuthUser = null;
       return merged;
     }
   } catch {}
@@ -71,7 +75,10 @@ function loadConfig() {
 }
 
 function saveConfig(config) {
-  fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2));
+  const out = { ...config };
+  delete out.twitchAuthToken;
+  delete out.twitchAuthUser;
+  fs.writeFileSync(CONFIG_PATH, JSON.stringify(out, null, 2));
 }
 
 module.exports = { DEFAULT_CONFIG, loadConfig, saveConfig };

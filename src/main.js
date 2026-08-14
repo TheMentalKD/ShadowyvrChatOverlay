@@ -123,7 +123,7 @@ ipcMain.handle('save-config', async (_event, newConfig) => {
   }
 
   const previousChannel = config.channel;
-  const { twitchConnected: _tc, ...safeConfig } = newConfig;
+  const { twitchConnected: _tc, twitchAuthToken: _tok, twitchAuthUser: _user, ...safeConfig } = newConfig;
   config = { ...config, ...safeConfig };
   delete config.twitchClientId;
   delete config.twitchAuth;
