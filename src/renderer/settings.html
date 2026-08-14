@@ -36,10 +36,12 @@
           </div>
 
           <div class="toggle-row mt-12">
-            <label for="show-chat-input">Show chat input during click-through</label>
-            <label class="toggle">
-              <input type="checkbox" id="show-chat-input" />
-              <span class="slider"></span>
+            <label class="toggle-row-control">
+              <span>Show chat input during click-through</span>
+              <span class="toggle">
+                <input type="checkbox" id="show-chat-input" />
+                <span class="slider"></span>
+              </span>
             </label>
           </div>
           <span class="hint">Chat input is always visible when click-through is off. Enable this to keep it visible when click-through is active.</span>
@@ -53,19 +55,23 @@
 
         <div class="section-divider">
           <div class="toggle-row">
-            <label for="show-shared-chat">Show shared chat messages</label>
-            <label class="toggle">
-              <input type="checkbox" id="show-shared-chat" checked />
-              <span class="slider"></span>
+            <label class="toggle-row-control">
+              <span>Show shared chat messages</span>
+              <span class="toggle">
+                <input type="checkbox" id="show-shared-chat" checked />
+                <span class="slider"></span>
+              </span>
             </label>
           </div>
 
           <div id="shared-chat-sub">
             <div class="toggle-row">
-              <label for="show-shared-avatars">Show channel avatars</label>
-              <label class="toggle">
-                <input type="checkbox" id="show-shared-avatars" checked />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Show channel avatars</span>
+                <span class="toggle">
+                  <input type="checkbox" id="show-shared-avatars" checked />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
           </div>
@@ -174,10 +180,12 @@
 
             </div>
             <div class="toggle-row">
-              <label for="text-shadow-twitch">Text shadow</label>
-              <label class="toggle">
-                <input type="checkbox" data-base="text-shadow" id="text-shadow-twitch" />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Text shadow</span>
+                <span class="toggle">
+                  <input type="checkbox" data-base="text-shadow" id="text-shadow-twitch" />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
             <div class="field" data-base="shadow-opacity-field" id="shadow-opacity-field-twitch">
@@ -185,10 +193,12 @@
               <input type="range" data-base="shadow-opacity" id="shadow-opacity-twitch" min="0" max="100" value="90" />
             </div>
             <div class="toggle-row">
-              <label for="text-background-twitch">Text background</label>
-              <label class="toggle">
-                <input type="checkbox" data-base="text-background" id="text-background-twitch" />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Text background</span>
+                <span class="toggle">
+                  <input type="checkbox" data-base="text-background" id="text-background-twitch" />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
             <div class="field" data-base="text-background-opacity-field" id="text-background-opacity-field-twitch">
@@ -212,42 +222,52 @@
             <p class="hint mb-8">Show alerts for Twitch channel events. Useful if you don't use a bot like Wizebot or StreamElements.</p>
 
             <div class="toggle-row">
-              <label for="event-subs">Subscriptions</label>
-              <label class="toggle">
-                <input type="checkbox" id="event-subs" checked />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Subscriptions</span>
+                <span class="toggle">
+                  <input type="checkbox" id="event-subs" checked />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
 
             <div class="toggle-row">
-              <label for="event-subgifts">Gifted subscriptions</label>
-              <label class="toggle">
-                <input type="checkbox" id="event-subgifts" checked />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Gifted subscriptions</span>
+                <span class="toggle">
+                  <input type="checkbox" id="event-subgifts" checked />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
 
             <div class="toggle-row">
-              <label for="event-raids">Raids</label>
-              <label class="toggle">
-                <input type="checkbox" id="event-raids" checked />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Raids</span>
+                <span class="toggle">
+                  <input type="checkbox" id="event-raids" checked />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
 
             <div class="toggle-row">
-              <label for="event-cheers">Cheers / Bits</label>
-              <label class="toggle">
-                <input type="checkbox" id="event-cheers" checked />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Cheers / Bits</span>
+                <span class="toggle">
+                  <input type="checkbox" id="event-cheers" checked />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
 
             <div class="toggle-row">
-              <label for="event-follows">Follows</label>
-              <label class="toggle">
-                <input type="checkbox" id="event-follows" />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Follows</span>
+                <span class="toggle">
+                  <input type="checkbox" id="event-follows" />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
             <span class="hint hint-block">Follows require the channel owner to be logged in.</span>
@@ -260,59 +280,73 @@
         <h3>Chat Options</h3>
 
         <div class="toggle-row">
-          <label for="show-timestamps">Show timestamps</label>
-          <label class="toggle">
-            <input type="checkbox" id="show-timestamps" checked />
-            <span class="slider"></span>
+          <label class="toggle-row-control">
+            <span>Show timestamps</span>
+            <span class="toggle">
+              <input type="checkbox" id="show-timestamps" checked />
+              <span class="slider"></span>
+            </span>
           </label>
         </div>
 
         <div class="toggle-row">
-          <label for="show-badges">Show Twitch badges</label>
-          <label class="toggle">
-            <input type="checkbox" id="show-badges" checked />
-            <span class="slider"></span>
+          <label class="toggle-row-control">
+            <span>Show Twitch badges</span>
+            <span class="toggle">
+              <input type="checkbox" id="show-badges" checked />
+              <span class="slider"></span>
+            </span>
           </label>
         </div>
 
         <div class="toggle-row">
-          <label for="show-nameplates">Show nameplates</label>
-          <label class="toggle">
-            <input type="checkbox" id="show-nameplates" checked />
-            <span class="slider"></span>
+          <label class="toggle-row-control">
+            <span>Show nameplates</span>
+            <span class="toggle">
+              <input type="checkbox" id="show-nameplates" checked />
+              <span class="slider"></span>
+            </span>
           </label>
         </div>
         <span class="hint">Shows a colour-coded pill behind each username using their Twitch chat colour.</span>
 
         <div class="filter-sub" id="nameplate-suboptions">
           <div class="toggle-row sub-toggle-row">
-            <label for="nameplate-normal">Normal viewers</label>
-            <label class="toggle toggle-sm">
-              <input type="checkbox" id="nameplate-normal" checked />
-              <span class="slider"></span>
+            <label class="toggle-row-control">
+              <span>Normal viewers</span>
+              <span class="toggle toggle-sm">
+                <input type="checkbox" id="nameplate-normal" checked />
+                <span class="slider"></span>
+              </span>
             </label>
           </div>
           <div class="toggle-row sub-toggle-row">
-            <label for="nameplate-mod">Mods</label>
-            <label class="toggle toggle-sm">
-              <input type="checkbox" id="nameplate-mod" checked />
-              <span class="slider"></span>
+            <label class="toggle-row-control">
+              <span>Mods</span>
+              <span class="toggle toggle-sm">
+                <input type="checkbox" id="nameplate-mod" checked />
+                <span class="slider"></span>
+              </span>
             </label>
           </div>
           <div class="toggle-row sub-toggle-row">
-            <label for="nameplate-vip">VIPs</label>
-            <label class="toggle toggle-sm">
-              <input type="checkbox" id="nameplate-vip" checked />
-              <span class="slider"></span>
+            <label class="toggle-row-control">
+              <span>VIPs</span>
+              <span class="toggle toggle-sm">
+                <input type="checkbox" id="nameplate-vip" checked />
+                <span class="slider"></span>
+              </span>
             </label>
           </div>
         </div>
 
         <div class="toggle-row">
-          <label for="show-reply-threads">Show reply threads</label>
-          <label class="toggle">
-            <input type="checkbox" id="show-reply-threads" checked />
-            <span class="slider"></span>
+          <label class="toggle-row-control">
+            <span>Show reply threads</span>
+            <span class="toggle">
+              <input type="checkbox" id="show-reply-threads" checked />
+              <span class="slider"></span>
+            </span>
           </label>
         </div>
         <span class="hint">Shows which message a reply is responding to, above the reply itself.</span>
@@ -323,10 +357,12 @@
         <h3>Filters</h3>
 
         <div class="toggle-row">
-          <label for="filter-bots">Ignore bot messages</label>
-          <label class="toggle">
-            <input type="checkbox" id="filter-bots" checked />
-            <span class="slider"></span>
+          <label class="toggle-row-control">
+            <span>Ignore bot messages</span>
+            <span class="toggle">
+              <input type="checkbox" id="filter-bots" checked />
+              <span class="slider"></span>
+            </span>
           </label>
         </div>
 
@@ -336,10 +372,12 @@
         </div>
 
         <div class="toggle-row mt-10">
-          <label for="filter-commands">Ignore commands</label>
-          <label class="toggle">
-            <input type="checkbox" id="filter-commands" checked />
-            <span class="slider"></span>
+          <label class="toggle-row-control">
+            <span>Ignore commands</span>
+            <span class="toggle">
+              <input type="checkbox" id="filter-commands" checked />
+              <span class="slider"></span>
+            </span>
           </label>
         </div>
         <span class="hint">Hides all ! commands (e.g. !so, !sr, !lurk) and Twitch slash commands (/shoutout, /timeout, /ban…)</span>
@@ -354,18 +392,22 @@
         <h3>Behaviour</h3>
 
         <div class="toggle-row">
-          <label for="click-through">Click-through (overlay ignores mouse)</label>
-          <label class="toggle">
-            <input type="checkbox" id="click-through" />
-            <span class="slider"></span>
+          <label class="toggle-row-control">
+            <span>Click-through (overlay ignores mouse)</span>
+            <span class="toggle">
+              <input type="checkbox" id="click-through" />
+              <span class="slider"></span>
+            </span>
           </label>
         </div>
 
         <div class="toggle-row">
-          <label for="hide-from-capture">Hide from screen capture</label>
-          <label class="toggle">
-            <input type="checkbox" id="hide-from-capture" />
-            <span class="slider"></span>
+          <label class="toggle-row-control">
+            <span>Hide from screen capture</span>
+            <span class="toggle">
+              <input type="checkbox" id="hide-from-capture" />
+              <span class="slider"></span>
+            </span>
           </label>
         </div>
         <span class="hint">Overlay stays visible to you, but is excluded from OBS, Discord/Zoom screen share, and screenshots. Not supported on Linux.</span>
@@ -490,10 +532,12 @@
 
             </div>
             <div class="toggle-row">
-              <label for="text-shadow-youtube">Text shadow</label>
-              <label class="toggle">
-                <input type="checkbox" data-base="text-shadow" id="text-shadow-youtube" />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Text shadow</span>
+                <span class="toggle">
+                  <input type="checkbox" data-base="text-shadow" id="text-shadow-youtube" />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
             <div class="field" data-base="shadow-opacity-field" id="shadow-opacity-field-youtube">
@@ -501,10 +545,12 @@
               <input type="range" data-base="shadow-opacity" id="shadow-opacity-youtube" min="0" max="100" value="90" />
             </div>
             <div class="toggle-row">
-              <label for="text-background-youtube">Text background</label>
-              <label class="toggle">
-                <input type="checkbox" data-base="text-background" id="text-background-youtube" />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Text background</span>
+                <span class="toggle">
+                  <input type="checkbox" data-base="text-background" id="text-background-youtube" />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
             <div class="field" data-base="text-background-opacity-field" id="text-background-opacity-field-youtube">
@@ -632,10 +678,12 @@
 
             </div>
             <div class="toggle-row">
-              <label for="text-shadow-kick">Text shadow</label>
-              <label class="toggle">
-                <input type="checkbox" data-base="text-shadow" id="text-shadow-kick" />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Text shadow</span>
+                <span class="toggle">
+                  <input type="checkbox" data-base="text-shadow" id="text-shadow-kick" />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
             <div class="field" data-base="shadow-opacity-field" id="shadow-opacity-field-kick">
@@ -643,10 +691,12 @@
               <input type="range" data-base="shadow-opacity" id="shadow-opacity-kick" min="0" max="100" value="90" />
             </div>
             <div class="toggle-row">
-              <label for="text-background-kick">Text background</label>
-              <label class="toggle">
-                <input type="checkbox" data-base="text-background" id="text-background-kick" />
-                <span class="slider"></span>
+              <label class="toggle-row-control">
+                <span>Text background</span>
+                <span class="toggle">
+                  <input type="checkbox" data-base="text-background" id="text-background-kick" />
+                  <span class="slider"></span>
+                </span>
               </label>
             </div>
             <div class="field" data-base="text-background-opacity-field" id="text-background-opacity-field-kick">

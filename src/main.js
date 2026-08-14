@@ -219,7 +219,7 @@ ipcMain.handle('open-external', (_e, url) => {
     return;
   }
   if (parsed.protocol === 'https:' && allowedHosts.has(parsed.hostname)) {
-    shell.openExternal(url);
+    shell.openExternal(parsed.href);
   }
 });
 

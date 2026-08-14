@@ -2,15 +2,17 @@
 let config = null;
 
 // Every image src assigned below (avatars, badges, emotes) ultimately comes from a Twitch/7TV/
-// BTTV/FFZ API response, not from something this process controls — reject anything that isn't
-// a plain http(s) URL before it reaches the DOM, so a malformed or unexpected response can't put
-// a data:/javascript:/file: URI in an <img src>.
-function isSafeImageUrl(url) {
-  if (typeof url !== 'string') return false;
+// BTTV/FFZ API response, not from something this process controls. Returns the parsed, re-
+// serialized URL (never the original string) when it's a plain http(s) URL, or null otherwise —
+// callers assign this return value to `.src`, not the input, so a malformed or unexpected
+// response can never put a data:/javascript:/file: URI in an <img src>.
+function safeImageUrl(url) {
+  if (typeof url !== 'string') return null;
   try {
-    return ['http:', 'https:'].includes(new URL(url).protocol);
+    const parsed = new URL(url);
+    return ['http:', 'https:'].includes(parsed.protocol) ? parsed.href : null;
   } catch {
-    return false;
+    return null;
   }
 }
 
@@ -427,7 +429,7 @@ function scheduleFade(el) {
   const timer = setTimeout(() => {
     el.classList.add('fading');
     setTimeout(() => {
-      if (el.parentNode) el.parentNode.removeChild(el);
+      el.remove();
     }, fadeDurationMs);
   }, secs * 1000);
 
@@ -495,10 +497,11 @@ function buildTextWithReplacements(text, replacements) {
     if (start < cursor) continue;
     if (start > cursor) frag.appendChild(document.createTextNode(text.slice(cursor, start)));
 
-    if (isSafeImageUrl(url)) {
+    const safeUrl = safeImageUrl(url);
+    if (safeUrl) {
       const img = document.createElement('img');
       img.className = 'emote';
-      img.src = url;
+      img.src = safeUrl;
       img.alt = text.slice(start, end + 1);
       img.title = text.slice(start, end + 1);
       frag.appendChild(img);
@@ -555,7 +558,7 @@ function buildEventMessageBody({ eventType, username, text, timestamp }) {
     const ts = document.createElement('span');
     ts.className = 'timestamp';
     ts.textContent = timestamp;
-    body.insertBefore(ts, iconEl);
+    iconEl.before(ts);
   }
   return body;
 }
@@ -575,10 +578,13 @@ function appendChatSourceRow(msg, { sourceChannel, isSharedSource, sourceChannel
   const sourceRow = document.createElement('div');
   sourceRow.className = 'message-source';
 
-  if (isSharedSource && config?.showSharedChatAvatars !== false && isSafeImageUrl(sourceChannelAvatar)) {
+  const safeAvatarUrl = isSharedSource && config?.showSharedChatAvatars !== false
+    ? safeImageUrl(sourceChannelAvatar)
+    : null;
+  if (safeAvatarUrl) {
     const avatar = document.createElement('img');
     avatar.className = 'source-avatar';
-    avatar.src = sourceChannelAvatar;
+    avatar.src = safeAvatarUrl;
     avatar.alt = '';
     avatar.referrerPolicy = 'no-referrer';
     sourceRow.appendChild(avatar);
@@ -614,10 +620,11 @@ function appendChatBadges(body, badges) {
   const badgesEl = document.createElement('span');
   badgesEl.className = 'badges';
   for (const url of badges) {
-    if (!isSafeImageUrl(url)) continue;
+    const safeUrl = safeImageUrl(url);
+    if (!safeUrl) continue;
     const img = document.createElement('img');
     img.className = 'badge';
-    img.src = url;
+    img.src = safeUrl;
     img.alt = '';
     img.referrerPolicy = 'no-referrer';
     badgesEl.appendChild(img);
@@ -685,7 +692,7 @@ function trimToMaxMessages() {
   while (messagesEl.children.length >= max) {
     const oldest = messagesEl.firstChild;
     if (oldest?._fadeTimer) clearTimeout(oldest._fadeTimer);
-    messagesEl.removeChild(oldest);
+    oldest.remove();
   }
 }
 
@@ -777,7 +784,7 @@ window.electronAPI.onChatMessage((msg) => {
 
 function removeMessageEl(el) {
   if (el._fadeTimer) clearTimeout(el._fadeTimer);
-  if (el.parentNode) el.parentNode.removeChild(el);
+  el.remove();
 }
 
 window.electronAPI.onMessageDeleted(({ messageId }) => {
@@ -786,10 +793,14 @@ window.electronAPI.onMessageDeleted(({ messageId }) => {
   if (el) removeMessageEl(el);
 });
 
+function userClearSelector(username, userId) {
+  if (userId) return `[data-user-id="${CSS.escape(userId)}"]`;
+  if (username) return `[data-username="${CSS.escape(username.toLowerCase())}"]`;
+  return null;
+}
+
 window.electronAPI.onUserCleared(({ username, userId }) => {
-  const selector = userId
-    ? `[data-user-id="${CSS.escape(userId)}"]`
-    : username ? `[data-username="${CSS.escape(username.toLowerCase())}"]` : null;
+  const selector = userClearSelector(username, userId);
   if (!selector) return;
   messagesEl.querySelectorAll(selector).forEach(removeMessageEl);
 });

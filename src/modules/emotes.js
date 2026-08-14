@@ -41,7 +41,7 @@ async function fetchBTTVGlobal() {
 
 async function fetchBTTVChannel(login) {
   const userId = await getTwitchUserId(login);
-  const data = await safeFetch(`https://api.betterttv.net/3/cached/users/twitch/${userId}`);
+  const data = await safeFetch(`https://api.betterttv.net/3/cached/users/twitch/${encodeURIComponent(userId)}`);
   const map = new Map();
   for (const e of [...(data?.channelEmotes ?? []), ...(data?.sharedEmotes ?? [])]) {
     map.set(e.code, `https://cdn.betterttv.net/emote/${e.id}/1x`);

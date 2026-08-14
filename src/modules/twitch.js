@@ -36,11 +36,11 @@ function isConnected() { return twitchConnected; }
 function unescapeIrcTag(str) {
   if (!str) return str;
   return str
-    .replaceAll(/\\s/g, ' ')
-    .replaceAll(/\\:/g, ';')
-    .replaceAll(/\\r/g, '\r')
-    .replaceAll(/\\n/g, '\n')
-    .replaceAll(/\\\\/g, '\\');
+    .replaceAll('\\s', ' ')
+    .replaceAll('\\:', ';')
+    .replaceAll('\\r', '\r')
+    .replaceAll('\\n', '\n')
+    .replaceAll('\\\\', '\\');
 }
 
 const MODERATION_SLASH_COMMANDS = [

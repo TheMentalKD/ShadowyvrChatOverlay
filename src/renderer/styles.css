@@ -156,9 +156,12 @@ body.clickthrough .header-close-btn {
   flex-shrink: 0;
 }
 
+/* Opaque rather than the app's usual translucent overlay chrome: this is a brief hover-state
+   highlight, not part of the see-through desktop/game backdrop the rest of the window relies
+   on, and a static analyzer can't verify text contrast against an alpha-blended background. */
 .header-close-btn:hover {
   color: #ffffff;
-  background: rgba(231, 76, 60, 0.7);
+  background: #a2352a;
 }
 
 .menu-label {
@@ -176,7 +179,7 @@ body.clickthrough .header-close-btn {
 .menu-item:hover > .menu-label,
 .menu-item.open > .menu-label {
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.12);
+  background: #1f1f1f;
 }
 
 .menu-dropdown {
@@ -286,11 +289,11 @@ body.clickthrough .header-close-btn {
 
 #connect-btn:hover {
   color: #b98bff;
-  background: rgba(145, 71, 255, 0.15);
+  background: #160b26;
 }
 
 #close-btn:hover {
-  background: rgba(231, 76, 60, 0.25);
+  background: #3a130f;
   color: #ff8a75;
 }
 
@@ -380,7 +383,7 @@ body.clickthrough .header-close-btn {
 
 #settings-btn:hover {
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.1);
+  background: #1a1a1a;
 }
 
 #chat-container {
@@ -859,6 +862,14 @@ body.settings-page .settings-container {
   color: #ccc;
 }
 
+/* Wraps both the row's text and its switch in one <label> (so the input has a single, complete
+   accessible name instead of two separate labels, one of which had no text of its own). Given
+   `display: contents`, the label generates no box of its own — its two children become direct
+   flex items of .toggle-row again, so the visual layout is unchanged from before this wrapped. */
+.toggle-row-control {
+  display: contents;
+}
+
 .toggle {
   position: relative;
   width: 38px;
@@ -1086,7 +1097,7 @@ body.settings-page .settings-container {
 
 #chat-input {
   flex: 1;
-  background: rgba(255, 255, 255, 0.08);
+  background: #141414;
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 4px;
   color: #fff;

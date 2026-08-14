@@ -187,7 +187,7 @@ function applyFontSelectionToAll() {
 
 function syncFontSelectionFromSelect(platform) {
   const select = fieldEl('font-family', platform);
-  if (!select || !select.value) return;
+  if (!select?.value) return;
   const parsed = parseOptionValue(select.value);
   selectedFontFamily = parsed.family;
   selectedFontSource = parsed.source;

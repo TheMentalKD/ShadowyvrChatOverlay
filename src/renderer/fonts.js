@@ -31,10 +31,15 @@ function isGoogleFont(name) {
   return GOOGLE_FONT_SET.has(name);
 }
 
+// Pulled out of quoteFontName() to avoid nesting these template literals inside the one it
+// builds below — same escaped-backslash and escaped-quote replacements, just declared once.
+const ESCAPED_BACKSLASH = String.raw`\\`;
+const ESCAPED_QUOTE = String.raw`\'`;
+
 function quoteFontName(name) {
   if (!name) return 'system-ui';
   if (/^[a-zA-Z0-9-]+$/.test(name)) return name;
-  return `'${String(name).replaceAll('\\', String.raw`\\`).replaceAll("'", String.raw`\'`)}'`;
+  return `'${String(name).replaceAll('\\', ESCAPED_BACKSLASH).replaceAll("'", ESCAPED_QUOTE)}'`;
 }
 
 function fontFamilyCss(name) {
