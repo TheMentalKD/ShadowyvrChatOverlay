@@ -4,6 +4,17 @@ let globalThirdPartyEmotes = null;
 const channelThirdPartyEmotes = new Map();
 const emoteMapCache = new Map();
 
+// Twitch logins are alphanumeric + underscore only, and Twitch user IDs are purely numeric.
+// twitch.js already validates the channel name before it ever reaches this module, but that
+// check lives in a different file this module has no visibility into — every URL built below
+// validates its own input again, right where it's used.
+function isValidTwitchLogin(login) {
+  return typeof login === 'string' && /^[a-z0-9_]{1,25}$/.test(login);
+}
+function isValidTwitchUserId(userId) {
+  return typeof userId === 'string' && /^\d+$/.test(userId);
+}
+
 async function safeFetch(url) {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status} from ${url}`);
@@ -21,6 +32,7 @@ async function fetch7TVGlobal() {
 }
 
 async function fetch7TVChannel(login) {
+  if (!isValidTwitchLogin(login)) return new Map();
   const user = await safeFetch(`https://7tv.io/v3/users/twitch/${encodeURIComponent(login)}`);
   const map = new Map();
   for (const e of user?.emote_set?.emotes ?? []) {
@@ -40,7 +52,9 @@ async function fetchBTTVGlobal() {
 }
 
 async function fetchBTTVChannel(login) {
+  if (!isValidTwitchLogin(login)) return new Map();
   const userId = await getTwitchUserId(login);
+  if (!isValidTwitchUserId(userId)) return new Map();
   const data = await safeFetch(`https://api.betterttv.net/3/cached/users/twitch/${encodeURIComponent(userId)}`);
   const map = new Map();
   for (const e of [...(data?.channelEmotes ?? []), ...(data?.sharedEmotes ?? [])]) {
@@ -62,6 +76,7 @@ async function fetchFFZGlobal() {
 }
 
 async function fetchFFZChannel(login) {
+  if (!isValidTwitchLogin(login)) return new Map();
   const data = await safeFetch(`https://api.frankerfacez.com/v1/room/${encodeURIComponent(login)}`);
   const map = new Map();
   for (const set of Object.values(data?.sets ?? {})) {
