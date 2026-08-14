@@ -48,8 +48,10 @@ jobs:
           node-version: 22
           cache: npm
 
+      # See ci.yml for why --ignore-scripts is safe here: nothing in this dependency tree
+      # needs an install-time lifecycle script to function.
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       # Only runs for the "Run workflow" button path. Uses the default GITHUB_TOKEN
       # (via actions/checkout's persisted credentials), and GitHub does not trigger a

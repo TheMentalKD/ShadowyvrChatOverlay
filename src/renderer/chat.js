@@ -1,6 +1,19 @@
 
 let config = null;
 
+// Every image src assigned below (avatars, badges, emotes) ultimately comes from a Twitch/7TV/
+// BTTV/FFZ API response, not from something this process controls — reject anything that isn't
+// a plain http(s) URL before it reaches the DOM, so a malformed or unexpected response can't put
+// a data:/javascript:/file: URI in an <img src>.
+function isSafeImageUrl(url) {
+  if (typeof url !== 'string') return false;
+  try {
+    return ['http:', 'https:'].includes(new URL(url).protocol);
+  } catch {
+    return false;
+  }
+}
+
 const channelColorMap = new Map();
 const CHANNEL_COLORS = [
   '#e91e8c', '#1e91e9', '#e9811e', '#1ee97a',
@@ -421,105 +434,273 @@ function scheduleFade(el) {
   el._fadeTimer = timer;
 }
 
-function parseTwitchEmoteTag(emotesTag) {
-  if (!emotesTag) return [];
-  const replacements = [];
-  const entries = typeof emotesTag === 'string' ? emotesTag : null;
-  const obj = entries === null && typeof emotesTag === 'object' ? emotesTag : null;
+function twitchEmoteUrl(emoteId) {
+  return `https://static-cdn.jtvnw.net/emoticons/v2/${emoteId}/default/dark/1.0`;
+}
 
-  if (obj) {
-    for (const [emoteId, positions] of Object.entries(obj)) {
-      const url = `https://static-cdn.jtvnw.net/emoticons/v2/${emoteId}/default/dark/1.0`;
-      for (const pos of positions) {
-        const [s, e] = pos.split('-').map(Number);
-        replacements.push({ start: s, end: e, url });
-      }
-    }
-  } else if (entries) {
-    for (const part of entries.split('/')) {
-      const [emoteId, positions] = part.split(':');
-      if (!positions) continue;
-      const url = `https://static-cdn.jtvnw.net/emoticons/v2/${emoteId}/default/dark/1.0`;
-      for (const pos of positions.split(',')) {
-        const [s, e] = pos.split('-').map(Number);
-        replacements.push({ start: s, end: e, url });
-      }
+// tmi.js hands the `emotes` tag to us in one of two shapes depending on how the message
+// arrived: an object of { emoteId: ['start-end', ...] } for regular IRC messages, or a
+// "id:start-end,start-end/id:start-end" string for some event payloads.
+function parseTwitchEmoteObj(obj) {
+  const replacements = [];
+  for (const [emoteId, positions] of Object.entries(obj)) {
+    const url = twitchEmoteUrl(emoteId);
+    for (const pos of positions) {
+      const [start, end] = pos.split('-').map(Number);
+      replacements.push({ start, end, url });
     }
   }
+  return replacements;
+}
+
+function parseTwitchEmoteString(entries) {
+  const replacements = [];
+  for (const part of entries.split('/')) {
+    const [emoteId, positions] = part.split(':');
+    if (!positions) continue;
+    const url = twitchEmoteUrl(emoteId);
+    for (const pos of positions.split(',')) {
+      const [start, end] = pos.split('-').map(Number);
+      replacements.push({ start, end, url });
+    }
+  }
+  return replacements;
+}
+
+function parseTwitchEmoteTag(emotesTag) {
+  if (!emotesTag) return [];
+  const replacements =
+    typeof emotesTag === 'object' ? parseTwitchEmoteObj(emotesTag) : parseTwitchEmoteString(emotesTag);
   return replacements.sort((a, b) => a.start - b.start);
 }
 
-function renderMessageText(text, emotesTag, thirdPartyEmotes) {
-  const frag = document.createDocumentFragment();
-
-  const twitchReplacements = parseTwitchEmoteTag(emotesTag);
-
-  const twitchCoveredChars = new Set();
-  for (const r of twitchReplacements) {
-    for (let i = r.start; i <= r.end; i++) twitchCoveredChars.add(i);
+function findThirdPartyReplacements(text, thirdPartyEmotes, coveredChars) {
+  const found = [];
+  const wordRe = /\S+/g;
+  let m;
+  while ((m = wordRe.exec(text)) !== null) {
+    const wordStart = m.index;
+    const wordEnd = wordStart + m[0].length - 1;
+    if (coveredChars.has(wordStart)) continue;
+    const url = thirdPartyEmotes[m[0]];
+    if (url) found.push({ start: wordStart, end: wordEnd, url });
   }
+  return found;
+}
 
+function buildTextWithReplacements(text, replacements) {
+  const frag = document.createDocumentFragment();
+  let cursor = 0;
+  for (const { start, end, url } of replacements) {
+    if (start < cursor) continue;
+    if (start > cursor) frag.appendChild(document.createTextNode(text.slice(cursor, start)));
+
+    if (isSafeImageUrl(url)) {
+      const img = document.createElement('img');
+      img.className = 'emote';
+      img.src = url;
+      img.alt = text.slice(start, end + 1);
+      img.title = text.slice(start, end + 1);
+      frag.appendChild(img);
+    } else {
+      frag.appendChild(document.createTextNode(text.slice(start, end + 1)));
+    }
+    cursor = end + 1;
+  }
+  if (cursor < text.length) frag.appendChild(document.createTextNode(text.slice(cursor)));
+  return frag;
+}
+
+function renderMessageText(text, emotesTag, thirdPartyEmotes) {
+  const twitchReplacements = parseTwitchEmoteTag(emotesTag);
   const hasThirdParty = thirdPartyEmotes && Object.keys(thirdPartyEmotes).length > 0;
 
   if (twitchReplacements.length === 0 && !hasThirdParty) {
+    const frag = document.createDocumentFragment();
     frag.appendChild(document.createTextNode(text));
     return frag;
   }
 
-  const allReplacements = [...twitchReplacements];
-
+  let allReplacements = twitchReplacements;
   if (hasThirdParty) {
-    const wordRe = /\S+/g;
-    let m;
-    while ((m = wordRe.exec(text)) !== null) {
-      const word = m[0];
-      const wordStart = m.index;
-      const wordEnd = wordStart + word.length - 1;
-      if (twitchCoveredChars.has(wordStart)) continue;
-      const url = thirdPartyEmotes[word];
-      if (url) {
-        allReplacements.push({ start: wordStart, end: wordEnd, url });
-      }
+    const twitchCoveredChars = new Set();
+    for (const r of twitchReplacements) {
+      for (let i = r.start; i <= r.end; i++) twitchCoveredChars.add(i);
     }
+    allReplacements = [...twitchReplacements, ...findThirdPartyReplacements(text, thirdPartyEmotes, twitchCoveredChars)];
     allReplacements.sort((a, b) => a.start - b.start);
   }
 
-  let cursor = 0;
-  for (const { start, end, url } of allReplacements) {
-    if (start < cursor) continue;
-    if (start > cursor) {
-      frag.appendChild(document.createTextNode(text.slice(cursor, start)));
-    }
-    const img = document.createElement('img');
-    img.className = 'emote';
-    img.src = url;
-    img.alt = text.slice(start, end + 1);
-    img.title = text.slice(start, end + 1);
-    frag.appendChild(img);
-    cursor = end + 1;
-  }
-  if (cursor < text.length) {
-    frag.appendChild(document.createTextNode(text.slice(cursor)));
-  }
-
-  return frag;
+  return buildTextWithReplacements(text, allReplacements);
 }
 
-function appendMessage({ messageId, userId, username, text, color, sourceChannel, sourceChannelAvatar, isSharedSource, badges, isMod, isVip, replyTo, timestamp, isSystem, isEvent, eventType, emotes, thirdPartyEmotes }) {
-  if (!isSystem && !isEvent && isSharedSource && config?.showSharedChat === false) return;
+const EVENT_ICONS = { sub: '⭐', subgift: '🎁', raid: '⚔️', cheer: '💜', follow: '❤️' };
+
+function buildEventMessageBody({ eventType, username, text, timestamp }) {
+  const body = document.createElement('div');
+  body.className = 'message-body';
+  const iconEl = document.createElement('span');
+  iconEl.className = 'event-icon';
+  iconEl.textContent = (EVENT_ICONS[eventType] || '📢') + ' ';
+  const nameEl = document.createElement('span');
+  nameEl.className = 'event-username';
+  nameEl.textContent = username;
+  const textEl = document.createElement('span');
+  textEl.className = 'text';
+  textEl.textContent = ' ' + text;
+  body.appendChild(iconEl);
+  body.appendChild(nameEl);
+  body.appendChild(textEl);
+  if (timestamp && config?.showTimestamps) {
+    const ts = document.createElement('span');
+    ts.className = 'timestamp';
+    ts.textContent = timestamp;
+    body.insertBefore(ts, iconEl);
+  }
+  return body;
+}
+
+function buildSystemMessageBody(text) {
+  const body = document.createElement('div');
+  body.className = 'message-body';
+  const textEl = document.createElement('span');
+  textEl.className = 'text';
+  textEl.textContent = text;
+  body.appendChild(textEl);
+  return body;
+}
+
+function appendChatSourceRow(msg, { sourceChannel, isSharedSource, sourceChannelAvatar }) {
+  if (!sourceChannel || config?.showSharedChat === false) return;
+  const sourceRow = document.createElement('div');
+  sourceRow.className = 'message-source';
+
+  if (isSharedSource && config?.showSharedChatAvatars !== false && isSafeImageUrl(sourceChannelAvatar)) {
+    const avatar = document.createElement('img');
+    avatar.className = 'source-avatar';
+    avatar.src = sourceChannelAvatar;
+    avatar.alt = '';
+    avatar.referrerPolicy = 'no-referrer';
+    sourceRow.appendChild(avatar);
+  }
+
+  const badge = document.createElement('span');
+  badge.className = 'source-badge';
+  badge.textContent = sourceChannel.replace('#', '');
+  badge.style.background = getChannelColor(sourceChannel);
+  sourceRow.appendChild(badge);
+  msg.appendChild(sourceRow);
+}
+
+function appendChatReplyRow(msg, replyTo) {
+  if (!replyTo || config?.showReplyThreads === false) return;
+  const replyRow = document.createElement('div');
+  replyRow.className = 'message-reply';
+  const arrow = document.createElement('span');
+  arrow.className = 'reply-arrow';
+  arrow.textContent = '↳';
+  const replyText = document.createElement('span');
+  replyText.className = 'reply-text';
+  const replyName = replyTo.username ? `@${replyTo.username}: ` : '';
+  const replyBody = (replyTo.text || '').length > 80 ? `${replyTo.text.slice(0, 80)}…` : (replyTo.text || '');
+  replyText.textContent = `${replyName}${replyBody}`;
+  replyRow.appendChild(arrow);
+  replyRow.appendChild(replyText);
+  msg.appendChild(replyRow);
+}
+
+function appendChatBadges(body, badges) {
+  if (config?.showBadges === false || !Array.isArray(badges) || !badges.length) return;
+  const badgesEl = document.createElement('span');
+  badgesEl.className = 'badges';
+  for (const url of badges) {
+    if (!isSafeImageUrl(url)) continue;
+    const img = document.createElement('img');
+    img.className = 'badge';
+    img.src = url;
+    img.alt = '';
+    img.referrerPolicy = 'no-referrer';
+    badgesEl.appendChild(img);
+  }
+  body.appendChild(badgesEl);
+}
+
+// Whether the mod/VIP/normal-viewer nameplate pill is shown for this specific message —
+// pulled out of an inline nested ternary so each role's on/off setting is a plain, readable line.
+function nameplateEnabledFor({ isMod, isVip }) {
+  if (isMod) return config?.nameplateMod !== false;
+  if (isVip) return config?.nameplateVip !== false;
+  return config?.nameplateNormal !== false;
+}
+
+function appendChatUsername(body, { username, color, isMod, isVip }) {
+  const user = document.createElement('span');
+  user.className = 'username';
+  user.textContent = username;
+
+  const useNameplate = config?.showNameplates !== false && nameplateEnabledFor({ isMod, isVip });
+  if (!useNameplate) {
+    user.style.color = color || '#9147ff';
+    body.appendChild(user);
+    const colon = document.createElement('span');
+    colon.className = 'colon';
+    colon.textContent = ':';
+    body.appendChild(colon);
+    return;
+  }
+
+  const nameplate = document.createElement('span');
+  nameplate.className = 'nameplate';
+  nameplate.style.setProperty('--nameplate-color', color || '#9147ff');
+  if (isMod) nameplate.classList.add('role-mod');
+  else if (isVip) nameplate.classList.add('role-vip');
+  nameplate.appendChild(user);
+  body.appendChild(nameplate);
+}
+
+function buildChatMessageBody({ text, color, badges, isMod, isVip, timestamp, username, emotes, thirdPartyEmotes }) {
+  const body = document.createElement('div');
+  body.className = 'message-body';
+
+  if (config?.showTimestamps && timestamp) {
+    const ts = document.createElement('span');
+    ts.className = 'timestamp';
+    ts.textContent = timestamp;
+    body.appendChild(ts);
+  }
+
+  appendChatBadges(body, badges);
+  appendChatUsername(body, { username, color, isMod, isVip });
+
+  const textEl = document.createElement('span');
+  textEl.className = 'text';
+  textEl.appendChild(renderMessageText(text, emotes, thirdPartyEmotes));
+  body.appendChild(textEl);
+
+  return body;
+}
+
+function trimToMaxMessages() {
   const max = config?.maxMessages ?? 100;
   while (messagesEl.children.length >= max) {
     const oldest = messagesEl.firstChild;
     if (oldest?._fadeTimer) clearTimeout(oldest._fadeTimer);
     messagesEl.removeChild(oldest);
   }
+}
+
+function messageClassName(isEvent, isSystem, eventType) {
+  if (isEvent) return `message event event-${eventType || 'generic'}`;
+  if (isSystem) return 'message system';
+  return 'message';
+}
+
+function appendMessage({ messageId, userId, username, text, color, sourceChannel, sourceChannelAvatar, isSharedSource, badges, isMod, isVip, replyTo, timestamp, isSystem, isEvent, eventType, emotes, thirdPartyEmotes }) {
+  if (!isSystem && !isEvent && isSharedSource && config?.showSharedChat === false) return;
+  trimToMaxMessages();
 
   const msg = document.createElement('div');
-  if (isEvent) {
-    msg.className = `message event event-${eventType || 'generic'}`;
-  } else {
-    msg.className = isSystem ? 'message system' : 'message';
-  }
+  msg.className = messageClassName(isEvent, isSystem, eventType);
   if (!isSystem && !isEvent) {
     if (messageId) msg.dataset.messageId = messageId;
     if (userId) msg.dataset.userId = userId;
@@ -527,133 +708,13 @@ function appendMessage({ messageId, userId, username, text, color, sourceChannel
   }
 
   if (isEvent) {
-    const icons = { sub: '⭐', subgift: '🎁', raid: '⚔️', cheer: '💜', follow: '❤️' };
-    const icon = icons[eventType] || '📢';
-    const body = document.createElement('div');
-    body.className = 'message-body';
-    const iconEl = document.createElement('span');
-    iconEl.className = 'event-icon';
-    iconEl.textContent = icon + ' ';
-    const nameEl = document.createElement('span');
-    nameEl.className = 'event-username';
-    nameEl.textContent = username;
-    const textEl = document.createElement('span');
-    textEl.className = 'text';
-    textEl.textContent = ' ' + text;
-    body.appendChild(iconEl);
-    body.appendChild(nameEl);
-    body.appendChild(textEl);
-    if (timestamp && config?.showTimestamps) {
-      const ts = document.createElement('span');
-      ts.className = 'timestamp';
-      ts.textContent = timestamp;
-      body.insertBefore(ts, iconEl);
-    }
-    msg.appendChild(body);
+    msg.appendChild(buildEventMessageBody({ eventType, username, text, timestamp }));
   } else if (isSystem) {
-    const body = document.createElement('div');
-    body.className = 'message-body';
-    const textEl = document.createElement('span');
-    textEl.className = 'text';
-    textEl.textContent = text;
-    body.appendChild(textEl);
-    msg.appendChild(body);
+    msg.appendChild(buildSystemMessageBody(text));
   } else {
-    if (sourceChannel && config?.showSharedChat !== false) {
-      const sourceRow = document.createElement('div');
-      sourceRow.className = 'message-source';
-
-      if (isSharedSource && config?.showSharedChatAvatars !== false && sourceChannelAvatar) {
-        const avatar = document.createElement('img');
-        avatar.className = 'source-avatar';
-        avatar.src = sourceChannelAvatar;
-        avatar.alt = '';
-        avatar.referrerPolicy = 'no-referrer';
-        sourceRow.appendChild(avatar);
-      }
-
-      const badge = document.createElement('span');
-      badge.className = 'source-badge';
-      badge.textContent = sourceChannel.replace('#', '');
-      badge.style.background = getChannelColor(sourceChannel);
-      sourceRow.appendChild(badge);
-      msg.appendChild(sourceRow);
-    }
-
-    if (replyTo && config?.showReplyThreads !== false) {
-      const replyRow = document.createElement('div');
-      replyRow.className = 'message-reply';
-      const arrow = document.createElement('span');
-      arrow.className = 'reply-arrow';
-      arrow.textContent = '↳';
-      const replyText = document.createElement('span');
-      replyText.className = 'reply-text';
-      const replyName = replyTo.username ? `@${replyTo.username}: ` : '';
-      const replyBody = (replyTo.text || '').length > 80 ? `${replyTo.text.slice(0, 80)}…` : (replyTo.text || '');
-      replyText.textContent = `${replyName}${replyBody}`;
-      replyRow.appendChild(arrow);
-      replyRow.appendChild(replyText);
-      msg.appendChild(replyRow);
-    }
-
-    const body = document.createElement('div');
-    body.className = 'message-body';
-
-    if (config?.showTimestamps && timestamp) {
-      const ts = document.createElement('span');
-      ts.className = 'timestamp';
-      ts.textContent = timestamp;
-      body.appendChild(ts);
-    }
-
-    if (config?.showBadges !== false && Array.isArray(badges) && badges.length) {
-      const badgesEl = document.createElement('span');
-      badgesEl.className = 'badges';
-      for (const url of badges) {
-        const img = document.createElement('img');
-        img.className = 'badge';
-        img.src = url;
-        img.alt = '';
-        img.referrerPolicy = 'no-referrer';
-        badgesEl.appendChild(img);
-      }
-      body.appendChild(badgesEl);
-    }
-
-    const showNameplates = config?.showNameplates !== false;
-    const showForMod     = config?.nameplateMod !== false;
-    const showForVip     = config?.nameplateVip !== false;
-    const showForNormal  = config?.nameplateNormal !== false;
-    const useNameplate   = showNameplates && (isMod ? showForMod : isVip ? showForVip : showForNormal);
-
-    const user = document.createElement('span');
-    user.className = 'username';
-    user.textContent = username;
-
-    if (useNameplate) {
-      const nameplate = document.createElement('span');
-      nameplate.className = 'nameplate';
-      const userColor = color || '#9147ff';
-      nameplate.style.setProperty('--nameplate-color', userColor);
-      if (isMod) nameplate.classList.add('role-mod');
-      else if (isVip) nameplate.classList.add('role-vip');
-      nameplate.appendChild(user);
-      body.appendChild(nameplate);
-    } else {
-      user.style.color = color || '#9147ff';
-      body.appendChild(user);
-      const colon = document.createElement('span');
-      colon.className = 'colon';
-      colon.textContent = ':';
-      body.appendChild(colon);
-    }
-
-    const textEl = document.createElement('span');
-    textEl.className = 'text';
-    textEl.appendChild(renderMessageText(text, emotes, thirdPartyEmotes));
-    body.appendChild(textEl);
-
-    msg.appendChild(body);
+    appendChatSourceRow(msg, { sourceChannel, isSharedSource, sourceChannelAvatar });
+    appendChatReplyRow(msg, replyTo);
+    msg.appendChild(buildChatMessageBody({ text, color, badges, isMod, isVip, timestamp, username, emotes, thirdPartyEmotes }));
   }
 
   messagesEl.appendChild(msg);

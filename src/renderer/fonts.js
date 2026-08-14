@@ -34,7 +34,7 @@ function isGoogleFont(name) {
 function quoteFontName(name) {
   if (!name) return 'system-ui';
   if (/^[a-zA-Z0-9-]+$/.test(name)) return name;
-  return `'${String(name).replace(/\\/g, "\\\\").replace(/'/g, "\\'")}'`;
+  return `'${String(name).replaceAll('\\', String.raw`\\`).replaceAll("'", String.raw`\'`)}'`;
 }
 
 function fontFamilyCss(name) {
@@ -42,7 +42,7 @@ function fontFamilyCss(name) {
 }
 
 function googleFontsStylesheetUrl(family) {
-  const q = encodeURIComponent(family).replace(/%20/g, '+');
+  const q = encodeURIComponent(family).replaceAll('%20', '+');
   return `https://fonts.googleapis.com/css2?family=${q}:wght@400;500;600;700&display=swap`;
 }
 

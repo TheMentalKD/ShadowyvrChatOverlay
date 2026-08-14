@@ -1,6 +1,6 @@
 const { Tray, Menu, nativeImage, app } = require('electron');
-const path = require('path');
-const fs = require('fs');
+const path = require('node:path');
+const fs = require('node:fs');
 
 let tray = null;
 
@@ -28,8 +28,10 @@ function buildTrayMenu(updateReady, autoUpdater) {
   ];
 
   if (updateReady) {
-    items.push({ label: '🔄 Install Update & Restart', click: () => autoUpdater.quitAndInstall(false, true) });
-    items.push({ type: 'separator' });
+    items.push(
+      { label: '🔄 Install Update & Restart', click: () => autoUpdater.quitAndInstall(false, true) },
+      { type: 'separator' }
+    );
   }
 
   items.push({ label: 'Quit', click: () => app.quit() });

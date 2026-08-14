@@ -1,5 +1,5 @@
 const tmi = require('tmi.js');
-const http = require('http');
+const http = require('node:http');
 const { BrowserWindow } = require('electron');
 const WebSocketClient = require('ws');
 
@@ -36,37 +36,53 @@ function isConnected() { return twitchConnected; }
 function unescapeIrcTag(str) {
   if (!str) return str;
   return str
-    .replace(/\\s/g, ' ')
-    .replace(/\\:/g, ';')
-    .replace(/\\r/g, '\r')
-    .replace(/\\n/g, '\n')
-    .replace(/\\\\/g, '\\');
+    .replaceAll(/\\s/g, ' ')
+    .replaceAll(/\\:/g, ';')
+    .replaceAll(/\\r/g, '\r')
+    .replaceAll(/\\n/g, '\n')
+    .replaceAll(/\\\\/g, '\\');
+}
+
+const MODERATION_SLASH_COMMANDS = [
+  '/shoutout', '/timeout', '/ban', '/unban', '/slow', '/subscribers', '/emoteonly', '/clear',
+  '/mod', '/unmod', '/vip', '/commercial', '/host', '/unhost', '/raid', '/marker',
+];
+
+function isIgnoredBot(msgUsername, config) {
+  if (!config.filterBots) return false;
+  const botList = (config.ignoredBots || '').toLowerCase().split(/[,\s]+/).filter(Boolean);
+  return botList.includes(msgUsername);
+}
+
+function isBlockedUser(msgUsername, config) {
+  if (!config.blockedUsers) return false;
+  const blocked = config.blockedUsers.toLowerCase().split(/[,\s]+/).filter(Boolean);
+  return blocked.includes(msgUsername);
+}
+
+function isFilteredCommand(message, msgUsername, config) {
+  if (!config.filterCommands || !message) return false;
+  const isOwnMessage = config.twitchAuthUser && msgUsername === config.twitchAuthUser.toLowerCase();
+  if (isOwnMessage) return false;
+
+  const msgTrimmed = message.trim();
+  if (msgTrimmed.startsWith('!')) return true;
+
+  const msgLower = msgTrimmed.toLowerCase();
+  return MODERATION_SLASH_COMMANDS.some(cmd => msgLower === cmd || msgLower.startsWith(cmd + ' '));
 }
 
 function applyMessageFilters(message, tags, config) {
   const msgUsername = (tags['display-name'] || tags.username || 'anon').toLowerCase();
-
-  if (config.filterBots) {
-    const botList = (config.ignoredBots || '').toLowerCase().split(/[,\s]+/).filter(Boolean);
-    if (botList.includes(msgUsername)) return false;
-  }
-
-  if (config.blockedUsers) {
-    const blocked = config.blockedUsers.toLowerCase().split(/[,\s]+/).filter(Boolean);
-    if (blocked.includes(msgUsername)) return false;
-  }
-
-  if (config.filterCommands && message) {
-    const isOwnMessage = config.twitchAuthUser && msgUsername === config.twitchAuthUser.toLowerCase();
-    if (!isOwnMessage) {
-      const msgTrimmed = message.trim();
-      if (msgTrimmed.startsWith('!')) return false;
-      const slashCmds = ['/shoutout','/timeout','/ban','/unban','/slow','/subscribers','/emoteonly','/clear','/mod','/unmod','/vip','/commercial','/host','/unhost','/raid','/marker'];
-      const msgLower = msgTrimmed.toLowerCase();
-      if (slashCmds.some(cmd => msgLower === cmd || msgLower.startsWith(cmd + ' '))) return false;
-    }
-  }
+  if (isIgnoredBot(msgUsername, config)) return false;
+  if (isBlockedUser(msgUsername, config)) return false;
+  if (isFilteredCommand(message, msgUsername, config)) return false;
   return true;
+}
+
+const SUB_PLAN_LABELS = { Prime: 'Twitch Prime', '2000': 'Tier 2', '3000': 'Tier 3' };
+function subPlanLabel(planCode) {
+  return SUB_PLAN_LABELS[planCode] || 'Tier 1';
 }
 
 async function connectTwitch(channel) {
@@ -78,6 +94,13 @@ async function connectTwitch(channel) {
   twitchConnected = false;
   channel = String(channel || '').trim().replace(/^#/, '').toLowerCase();
   if (!channel) return { ok: false, error: 'Enter a channel name' };
+  // Twitch logins are alphanumeric + underscore only. Rejecting anything else here — before
+  // it's ever used to build IRC channel names, Helix/GQL requests, or third-party emote API
+  // URLs — closes off path/query injection into every one of those downstream requests at
+  // the source, rather than needing each call site to sanitize it separately.
+  if (!/^[a-z0-9_]{1,25}$/.test(channel)) {
+    return { ok: false, error: 'Not a valid Twitch channel name' };
+  }
 
   const config = getConfig();
   config.channel = channel;
@@ -125,7 +148,7 @@ async function connectTwitch(channel) {
     sendToOverlay('chat-message', { username: 'System', text: `Disconnected: ${reason || 'unknown'}`, isSystem: true });
     broadcastConfig();
 
-    if (reason && reason.toLowerCase().includes('login authentication failed')) {
+    if (reason?.toLowerCase().includes('login authentication failed')) {
       const cfg = getConfig();
       cfg.twitchAuthToken = null;
       cfg.twitchAuthUser = null;
@@ -196,8 +219,8 @@ async function connectTwitch(channel) {
       sourceChannelAvatar,
       isSharedSource,
       badges: resolveBadgeUrls(badgeTag, badgeRoomId),
-      isMod: !!tags.mod || !!(tags.badges && tags.badges.moderator),
-      isVip: !!(tags.badges && tags.badges.vip),
+      isMod: !!tags.mod || !!tags.badges?.moderator,
+      isVip: !!tags.badges?.vip,
       replyTo: tags['reply-parent-msg-id'] ? {
         username: tags['reply-parent-display-name'] || tags['reply-parent-user-login'] || null,
         text: unescapeIrcTag(tags['reply-parent-msg-body']) || ''
@@ -229,7 +252,7 @@ async function connectTwitch(channel) {
 
   twitchClient.on('subscription', (_ch, username, method, message, tags) => {
     if (!getConfig().eventSubs) return;
-    const plan = method?.plan === 'Prime' ? 'Twitch Prime' : method?.plan === '2000' ? 'Tier 2' : method?.plan === '3000' ? 'Tier 3' : 'Tier 1';
+    const plan = subPlanLabel(method?.plan);
     const msg = message ? ` — "${message}"` : '';
     sendToOverlay('chat-message', { username: tags?.['display-name'] || username, text: `just subscribed with ${plan}!${msg}`, isEvent: true, eventType: 'sub', timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
   });
@@ -237,20 +260,20 @@ async function connectTwitch(channel) {
   twitchClient.on('resub', (_ch, username, _months, message, tags, methods) => {
     if (!getConfig().eventSubs) return;
     const months = tags?.['msg-param-cumulative-months'] || _months || 0;
-    const plan = methods?.plan === 'Prime' ? 'Twitch Prime' : methods?.plan === '2000' ? 'Tier 2' : methods?.plan === '3000' ? 'Tier 3' : 'Tier 1';
+    const plan = subPlanLabel(methods?.plan);
     const msg = message ? ` — "${message}"` : '';
     sendToOverlay('chat-message', { username: tags?.['display-name'] || username, text: `resubscribed for ${months} months with ${plan}!${msg}`, isEvent: true, eventType: 'sub', timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
   });
 
   twitchClient.on('subgift', (_ch, username, _streakMonths, recipient, methods, tags) => {
     if (!getConfig().eventSubgifts) return;
-    const plan = methods?.plan === '2000' ? 'Tier 2' : methods?.plan === '3000' ? 'Tier 3' : 'Tier 1';
+    const plan = subPlanLabel(methods?.plan);
     sendToOverlay('chat-message', { username: tags?.['display-name'] || username, text: `gifted a ${plan} sub to ${recipient}!`, isEvent: true, eventType: 'subgift', timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
   });
 
   twitchClient.on('submysterygift', (_ch, username, giftCount, methods, tags) => {
     if (!getConfig().eventSubgifts) return;
-    const plan = methods?.plan === '2000' ? 'Tier 2' : methods?.plan === '3000' ? 'Tier 3' : 'Tier 1';
+    const plan = subPlanLabel(methods?.plan);
     sendToOverlay('chat-message', { username: tags?.['display-name'] || username, text: `gifted ${giftCount} ${plan} subs to the community!`, isEvent: true, eventType: 'subgift', timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
   });
 

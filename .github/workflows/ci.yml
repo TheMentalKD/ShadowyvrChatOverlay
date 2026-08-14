@@ -26,8 +26,12 @@ jobs:
           node-version: 22
           cache: npm
 
+      # --ignore-scripts: nothing in this dependency tree needs an install-time lifecycle
+      # script (checked via `hasInstallScript` in package-lock.json — the one package that has
+      # one, electron-winstaller, backs a Squirrel.Windows target this project doesn't use), and
+      # skipping them closes off a lifecycle-script supply-chain attack vector during CI installs.
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Lint
         run: npm run lint
@@ -53,8 +57,12 @@ jobs:
           node-version: 22
           cache: npm
 
+      # --ignore-scripts: nothing in this dependency tree needs an install-time lifecycle
+      # script (checked via `hasInstallScript` in package-lock.json — the one package that has
+      # one, electron-winstaller, backs a Squirrel.Windows target this project doesn't use), and
+      # skipping them closes off a lifecycle-script supply-chain attack vector during CI installs.
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Build installer (no publish)
         run: npm run pack
@@ -80,8 +88,12 @@ jobs:
           node-version: 22
           cache: npm
 
+      # --ignore-scripts: nothing in this dependency tree needs an install-time lifecycle
+      # script (checked via `hasInstallScript` in package-lock.json — the one package that has
+      # one, electron-winstaller, backs a Squirrel.Windows target this project doesn't use), and
+      # skipping them closes off a lifecycle-script supply-chain attack vector during CI installs.
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       # Runtime dependencies are what ships to users, so those must be clean.
       - name: Audit runtime dependencies

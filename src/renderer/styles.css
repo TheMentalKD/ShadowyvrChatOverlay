@@ -35,6 +35,7 @@ html, body {
   flex-direction: column;
   width: 100%;
   height: 100%;
+  -webkit-app-region: drag;
 }
 
 #drag-handle {
@@ -160,9 +161,6 @@ body.clickthrough .header-close-btn {
   background: rgba(231, 76, 60, 0.7);
 }
 
-.menu-item {
-}
-
 .menu-label {
   display: block;
   padding: 2px 7px;
@@ -252,12 +250,12 @@ body.clickthrough .header-close-btn {
 }
 
 .reconnect-btn-secondary {
-  background: rgba(255, 255, 255, 0.08);
+  background: #2c2c2c;
   color: #ccc;
 }
 
 .reconnect-btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: #3c3c3c;
   color: #fff;
 }
 
@@ -277,7 +275,7 @@ body.clickthrough .header-close-btn {
 }
 
 .menu-action:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: #313131;
   color: #ffffff;
 }
 
@@ -287,13 +285,13 @@ body.clickthrough .header-close-btn {
 }
 
 #connect-btn:hover {
-  color: #a96bff;
+  color: #b98bff;
   background: rgba(145, 71, 255, 0.15);
 }
 
 #close-btn:hover {
   background: rgba(231, 76, 60, 0.25);
-  color: #e74c3c;
+  color: #ff8a75;
 }
 
 .menu-separator {
@@ -358,12 +356,12 @@ body.clickthrough .header-close-btn {
 }
 
 #update-dismiss-btn {
-  background: rgba(255,255,255,0.08);
+  background: #2c2c3f;
   color: #aaa;
 }
 
 #update-dismiss-btn:hover {
-  background: rgba(255,255,255,0.14);
+  background: #3a3a4b;
   color: #fff;
 }
 
@@ -437,7 +435,7 @@ body.clickthrough .header-close-btn {
   padding: 3px 5px;
   border-radius: 4px;
   transition: background 0.1s, opacity 0.5s ease, transform 0.5s ease;
-  word-break: break-word;
+  overflow-wrap: break-word;
   animation: slide-in 0.15s ease-out;
 }
 
@@ -471,9 +469,6 @@ body.text-background .message {
 
 body.text-background .message:hover {
   background: rgba(0, 0, 0, var(--text-background-opacity, 0.5));
-}
-
-.message .text {
 }
 
 .message-source {
@@ -734,7 +729,7 @@ body.text-background .message:hover {
 }
 
 .auth-error {
-  margin-top: 10px;
+  margin-top: 6px;
   color: #e74c3c;
   font-size: 12px;
   max-width: 260px;
@@ -835,7 +830,7 @@ body.settings-page .settings-container {
   color: #eee;
   font-size: 15px;
   line-height: 1.4;
-  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .field input[type="range"] {
@@ -922,7 +917,7 @@ body.settings-page .settings-container {
   border-radius: 6px;
   border: 1px solid #3a3a3a;
   background: #2a2a2a;
-  color: #888;
+  color: #a3a3a3;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -1047,9 +1042,6 @@ body.settings-page .settings-container {
 .resize-se { bottom: 0; right: 0; cursor: se-resize; }
 .resize-sw { bottom: 0; left: 0;  cursor: sw-resize; }
 
-#app {
-  -webkit-app-region: drag;
-}
 
 #messages,
 #chat-container,
@@ -1188,11 +1180,6 @@ body.settings-page .settings-container {
   flex: 1;
 }
 
-.auth-error {
-  color: #e74c3c;
-  font-size: 12px;
-  margin-top: 6px;
-}
 
 .color-field-wrap {
   position: relative;
@@ -1218,7 +1205,7 @@ body.settings-page .settings-container {
 }
 
 .color-toggle-btn {
-  background: rgba(255,255,255,0.07);
+  background: #2a2a2a;
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 5px;
   color: #fff;
@@ -1325,10 +1312,10 @@ body.settings-page .settings-container {
 
 .format-btn {
   flex: 1;
-  background: rgba(255,255,255,0.07);
+  background: #222222;
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 5px;
-  color: #888;
+  color: #a3a3a3;
   cursor: pointer;
   font-size: 11px;
   font-weight: 600;
@@ -1355,7 +1342,7 @@ body.settings-page .settings-container {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(255,255,255,0.04);
+  background: #232323;
   border: none;
   color: #ccc;
   cursor: pointer;
@@ -1436,7 +1423,7 @@ body.settings-page .settings-container {
 .settings-page textarea {
   width: 100%;
   box-sizing: border-box;
-  background: rgba(255,255,255,0.06);
+  background: #282828;
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 6px;
   color: #fff;
@@ -1469,4 +1456,25 @@ body.settings-page .settings-container {
 .toggle-sm .slider {
   transform: scale(0.85);
   transform-origin: right center;
+}
+
+/* Spacing utilities — replace what used to be inline style="" attributes in
+   settings.html, so the settings-page CSP doesn't need 'unsafe-inline'. */
+.mt-neg-12 { margin-top: -12px; }
+.mt-neg-8  { margin-top: -8px; }
+.mt-12     { margin-top: 12px; }
+.mt-10     { margin-top: 10px; }
+.mb-8      { margin: 0 0 8px; }
+.hint-block { display: block; margin-top: 4px; }
+
+.section-divider {
+  margin-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 12px;
+}
+
+#shared-chat-sub {
+  margin-left: 16px;
+  border-left: 2px solid rgba(255, 255, 255, 0.08);
+  padding-left: 14px;
 }

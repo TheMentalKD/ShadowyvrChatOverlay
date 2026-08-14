@@ -296,24 +296,24 @@ document.getElementById('save-btn').addEventListener('click', async () => {
     youtubeId: document.getElementById('youtube-id').value.trim(),
     kickChannel: document.getElementById('kick-channel').value.trim(),
     platforms: Array.from(activePlatforms),
-    fontSize: parseInt(fieldEl('font-size', CANONICAL_PLATFORM).value, 10) || 14,
+    fontSize: Number.parseInt(fieldEl('font-size', CANONICAL_PLATFORM).value, 10) || 14,
     fontFamily: selectedFontFamily || 'Inter',
     fontSource: selectedFontSource || 'google',
-    maxMessages: parseInt(fieldEl('max-messages', CANONICAL_PLATFORM).value, 10) || 100,
+    maxMessages: Number.parseInt(fieldEl('max-messages', CANONICAL_PLATFORM).value, 10) || 100,
     theme: {
       background: fieldEl('bg-color', CANONICAL_PLATFORM).value || 'rgba(0,0,0,0.45)',
       text: fieldEl('text-color', CANONICAL_PLATFORM).value || '#ffffff',
       timestamp: '#888888',
       selfChannel: '#9147ff',
       channelColors: {},
-      textSharpness: parseInt(fieldEl('text-sharpness', CANONICAL_PLATFORM)?.value || '0', 10) || 0,
+      textSharpness: Number.parseInt(fieldEl('text-sharpness', CANONICAL_PLATFORM)?.value || '0', 10) || 0,
     },
-    opacity: parseInt(fieldEl('opacity', CANONICAL_PLATFORM).value, 10) / 100,
+    opacity: Number.parseInt(fieldEl('opacity', CANONICAL_PLATFORM).value, 10) / 100,
     showTimestamps: document.getElementById('show-timestamps').checked,
     textShadow: fieldEl('text-shadow', CANONICAL_PLATFORM).checked,
-    shadowOpacity: parseInt(fieldEl('shadow-opacity', CANONICAL_PLATFORM).value, 10) / 100,
+    shadowOpacity: Number.parseInt(fieldEl('shadow-opacity', CANONICAL_PLATFORM).value, 10) / 100,
     textBackground: fieldEl('text-background', CANONICAL_PLATFORM).checked,
-    textBackgroundOpacity: parseInt(fieldEl('text-background-opacity', CANONICAL_PLATFORM).value, 10) / 100,
+    textBackgroundOpacity: Number.parseInt(fieldEl('text-background-opacity', CANONICAL_PLATFORM).value, 10) / 100,
     showBadges: document.getElementById('show-badges').checked,
     showNameplates: document.getElementById('show-nameplates').checked,
     nameplateNormal: document.getElementById('nameplate-normal').checked,
@@ -331,7 +331,7 @@ document.getElementById('save-btn').addEventListener('click', async () => {
     ignoredBots: document.getElementById('ignored-bots').value.trim(),
     filterCommands: document.getElementById('filter-commands').checked,
     blockedUsers: document.getElementById('blocked-users').value.trim(),
-    messageFadeSeconds: Math.max(0, parseFloat(fieldEl('message-fade', CANONICAL_PLATFORM).value) || 0),
+    messageFadeSeconds: Math.max(0, Number.parseFloat(fieldEl('message-fade', CANONICAL_PLATFORM).value) || 0),
     clickThrough: document.getElementById('click-through').checked,
     hideFromCapture: document.getElementById('hide-from-capture').checked,
     toggleKey: document.getElementById('toggle-key').value.trim() || 'F9',
@@ -380,7 +380,7 @@ function applyAuthState(auth) {
   const authed = !!auth?.authed;
   authLoggedOut.hidden = authed;
   authLoggedIn.hidden  = !authed;
-  if (authed && auth.username) {
+  if (authed && auth?.username) {
     authUsername.textContent = auth.username;
   }
 }
@@ -420,23 +420,28 @@ logoutBtn.addEventListener('click', async () => {
 
 function parseColorToRgba(str) {
   str = (str || '').trim();
-  const rgbaMatch = str.match(/rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/);
+  // Pull the parenthesized content out with a simple, low-complexity pattern, then split and
+  // parse it in plain JS rather than one regex trying to validate every number itself.
+  const rgbaMatch = str.match(/rgba?\(([^)]*)\)/);
   if (rgbaMatch) {
-    return {
-      r: parseFloat(rgbaMatch[1]),
-      g: parseFloat(rgbaMatch[2]),
-      b: parseFloat(rgbaMatch[3]),
-      a: rgbaMatch[4] != null ? parseFloat(rgbaMatch[4]) : 1
-    };
+    const parts = rgbaMatch[1].split(',').map((p) => Number.parseFloat(p.trim()));
+    if (parts.length >= 3 && parts.slice(0, 3).every(Number.isFinite)) {
+      return {
+        r: parts[0],
+        g: parts[1],
+        b: parts[2],
+        a: Number.isFinite(parts[3]) ? parts[3] : 1
+      };
+    }
   }
   let hex = str.replace('#', '');
   if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
   if (hex.length === 6 || hex.length === 8) {
     return {
-      r: parseInt(hex.slice(0, 2), 16),
-      g: parseInt(hex.slice(2, 4), 16),
-      b: parseInt(hex.slice(4, 6), 16),
-      a: hex.length === 8 ? parseInt(hex.slice(6, 8), 16) / 255 : 1
+      r: Number.parseInt(hex.slice(0, 2), 16),
+      g: Number.parseInt(hex.slice(2, 4), 16),
+      b: Number.parseInt(hex.slice(4, 6), 16),
+      a: hex.length === 8 ? Number.parseInt(hex.slice(6, 8), 16) / 255 : 1
     };
   }
   return { r: 255, g: 255, b: 255, a: 1 };
@@ -611,13 +616,13 @@ function setupPicker(base, platform) {
   window.addEventListener('mouseup', () => { dragging = false; });
 
   hueSlider.addEventListener('input', () => {
-    hue = parseInt(hueSlider.value, 10);
+    hue = Number.parseInt(hueSlider.value, 10);
     drawCanvas();
     syncOutput();
   });
 
   alphaSlider.addEventListener('input', () => {
-    alpha = parseInt(alphaSlider.value, 10) / 100;
+    alpha = Number.parseInt(alphaSlider.value, 10) / 100;
     syncOutput();
   });
 

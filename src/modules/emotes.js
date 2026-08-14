@@ -21,7 +21,7 @@ async function fetch7TVGlobal() {
 }
 
 async function fetch7TVChannel(login) {
-  const user = await safeFetch(`https://7tv.io/v3/users/twitch/${login}`);
+  const user = await safeFetch(`https://7tv.io/v3/users/twitch/${encodeURIComponent(login)}`);
   const map = new Map();
   for (const e of user?.emote_set?.emotes ?? []) {
     const file = e.data?.host?.files?.find(f => f.format === 'WEBP' && f.name === '1x.webp') || e.data?.host?.files?.[0];
@@ -62,7 +62,7 @@ async function fetchFFZGlobal() {
 }
 
 async function fetchFFZChannel(login) {
-  const data = await safeFetch(`https://api.frankerfacez.com/v1/room/${login}`);
+  const data = await safeFetch(`https://api.frankerfacez.com/v1/room/${encodeURIComponent(login)}`);
   const map = new Map();
   for (const set of Object.values(data?.sets ?? {})) {
     for (const e of set?.emoticons ?? []) {
