@@ -34,6 +34,12 @@ function getChannelColor(channelName) {
 }
 
 const messagesEl   = document.getElementById('messages');
+
+let isNearBottom = true;
+messagesEl.addEventListener('scroll', () => {
+  const threshold = 50;
+  isNearBottom = messagesEl.scrollTop + messagesEl.clientHeight >= messagesEl.scrollHeight - threshold;
+});
 const statusDot    = document.getElementById('status-dot');
 const statusText   = document.getElementById('status-text');
 const emptyState   = document.getElementById('empty-state');
@@ -770,7 +776,9 @@ function appendMessage({ messageId, userId, username, text, color, sourceChannel
 
   messagesEl.appendChild(msg);
   scheduleFade(msg);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
+  if (isNearBottom) {
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
 }
 
 function applyConfig(cfg) {
