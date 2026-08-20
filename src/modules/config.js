@@ -51,7 +51,9 @@ const DEFAULT_CONFIG = {
   filterCommands: true,
   filterBots: true,
   ignoredBots: '',
-  blockedUsers: ''
+  blockedUsers: '',
+  showGifs: true,
+  autoScroll: true
 };
 
 function loadConfig() {

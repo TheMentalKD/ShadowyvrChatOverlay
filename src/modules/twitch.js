@@ -227,6 +227,7 @@ async function connectTwitch(channel) {
       } : null,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       emotes: tags.emotes || null,
+      gifs: tags.gifs || null,
       thirdPartyEmotes: buildThirdPartyEmoteMap(channel)
     });
   });

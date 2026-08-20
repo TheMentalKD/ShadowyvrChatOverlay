@@ -242,6 +242,7 @@ window.electronAPI.getConfig().then(async (config) => {
 
   document.getElementById('show-timestamps').checked = config.showTimestamps !== false;
   document.getElementById('show-badges').checked = config.showBadges !== false;
+  document.getElementById('show-gifs').checked = config.showGifs !== false;
   document.getElementById('show-nameplates').checked = config.showNameplates !== false;
   document.getElementById('nameplate-normal').checked = config.nameplateNormal !== false;
   document.getElementById('nameplate-mod').checked = config.nameplateMod !== false;
@@ -315,6 +316,7 @@ document.getElementById('save-btn').addEventListener('click', async () => {
     textBackground: fieldEl('text-background', CANONICAL_PLATFORM).checked,
     textBackgroundOpacity: Number.parseInt(fieldEl('text-background-opacity', CANONICAL_PLATFORM).value, 10) / 100,
     showBadges: document.getElementById('show-badges').checked,
+    showGifs: document.getElementById('show-gifs').checked,
     showNameplates: document.getElementById('show-nameplates').checked,
     nameplateNormal: document.getElementById('nameplate-normal').checked,
     nameplateMod: document.getElementById('nameplate-mod').checked,

@@ -519,7 +519,7 @@ function buildTextWithReplacements(text, replacements) {
   return frag;
 }
 
-function renderMessageText(text, emotesTag, thirdPartyEmotes) {
+function renderMessageText(text, emotesTag, thirdPartyEmotes, gifsTag) {
   const twitchReplacements = parseTwitchEmoteTag(emotesTag);
   const hasThirdParty = thirdPartyEmotes && Object.keys(thirdPartyEmotes).length > 0;
 
@@ -670,7 +670,21 @@ function appendChatUsername(body, { username, color, isMod, isVip }) {
   body.appendChild(nameplate);
 }
 
-function buildChatMessageBody({ text, color, badges, isMod, isVip, timestamp, username, emotes, thirdPartyEmotes }) {
+function parseGifsTag(gifsTag) {
+  if (!gifsTag || config?.showGifs === false) return [];
+  const gifs = [];
+  for (const part of gifsTag.split(',')) {
+    const segments = part.split('|');
+    if (segments.length < 3) continue;
+    const [range, id, url] = segments;
+    const [start, end] = range.split('-').map(Number);
+    const safeUrl = safeImageUrl(url);
+    if (safeUrl) gifs.push({ start, end, id, url: safeUrl });
+  }
+  return gifs;
+}
+
+function buildChatMessageBody({ text, color, badges, isMod, isVip, timestamp, username, emotes, thirdPartyEmotes, gifs }) {
   const body = document.createElement('div');
   body.className = 'message-body';
 
@@ -686,7 +700,33 @@ function buildChatMessageBody({ text, color, badges, isMod, isVip, timestamp, us
 
   const textEl = document.createElement('span');
   textEl.className = 'text';
-  textEl.appendChild(renderMessageText(text, emotes, thirdPartyEmotes));
+
+  const gifReplacements = parseGifsTag(gifs);
+  if (gifReplacements.length > 0) {
+    const twitchReplacements = parseTwitchEmoteTag(emotes);
+    let cursor = 0;
+    for (const { start, end, url } of gifReplacements) {
+      if (start > cursor) {
+        const beforeText = text.slice(cursor, start);
+        const frag = renderMessageText(beforeText, null, thirdPartyEmotes);
+        textEl.appendChild(frag);
+      }
+      const img = document.createElement('img');
+      img.className = 'chat-gif';
+      img.src = url;
+      img.alt = text.slice(start, end + 1);
+      img.title = text.slice(start, end + 1);
+      textEl.appendChild(img);
+      cursor = end + 1;
+    }
+    if (cursor < text.length) {
+      const afterText = text.slice(cursor);
+      const frag = renderMessageText(afterText, null, thirdPartyEmotes);
+      textEl.appendChild(frag);
+    }
+  } else {
+    textEl.appendChild(renderMessageText(text, emotes, thirdPartyEmotes));
+  }
   body.appendChild(textEl);
 
   return body;
@@ -707,7 +747,7 @@ function messageClassName(isEvent, isSystem, eventType) {
   return 'message';
 }
 
-function appendMessage({ messageId, userId, username, text, color, sourceChannel, sourceChannelAvatar, isSharedSource, badges, isMod, isVip, replyTo, timestamp, isSystem, isEvent, eventType, emotes, thirdPartyEmotes }) {
+function appendMessage({ messageId, userId, username, text, color, sourceChannel, sourceChannelAvatar, isSharedSource, badges, isMod, isVip, replyTo, timestamp, isSystem, isEvent, eventType, emotes, gifs, thirdPartyEmotes }) {
   if (!isSystem && !isEvent && isSharedSource && config?.showSharedChat === false) return;
   trimToMaxMessages();
 
@@ -726,14 +766,12 @@ function appendMessage({ messageId, userId, username, text, color, sourceChannel
   } else {
     appendChatSourceRow(msg, { sourceChannel, isSharedSource, sourceChannelAvatar });
     appendChatReplyRow(msg, replyTo);
-    msg.appendChild(buildChatMessageBody({ text, color, badges, isMod, isVip, timestamp, username, emotes, thirdPartyEmotes }));
+    msg.appendChild(buildChatMessageBody({ text, color, badges, isMod, isVip, timestamp, username, emotes, gifs, thirdPartyEmotes }));
   }
 
   messagesEl.appendChild(msg);
   scheduleFade(msg);
-
-  const nearBottom = messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight < 80;
-  if (nearBottom) messagesEl.scrollTop = messagesEl.scrollHeight;
+  messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
 function applyConfig(cfg) {
