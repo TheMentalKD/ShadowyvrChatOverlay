@@ -703,7 +703,6 @@ function buildChatMessageBody({ text, color, badges, isMod, isVip, timestamp, us
 
   const gifReplacements = parseGifsTag(gifs);
   if (gifReplacements.length > 0) {
-    const twitchReplacements = parseTwitchEmoteTag(emotes);
     let cursor = 0;
     for (const { start, end, url } of gifReplacements) {
       if (start > cursor) {
