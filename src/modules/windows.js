@@ -107,6 +107,12 @@ function createMainWindow(connectTwitch) {
     }
     const cfg = getConfig();
     mainWindow.setContentProtection(!!cfg.hideFromCapture);
+    // Force the window's mouse state explicitly on startup. Without this the
+    // ignore-mouse state is left in its stale default, so the overlay loads in a
+    // half-click-through limbo — it swallows clicks but still can't be interacted
+    // with. Applying the saved config (which defaults to non-click-through) makes
+    // it load interactive, and click-through is only enabled by the hotkey.
+    applyClickThrough(cfg.clickThrough);
   });
 }
 
