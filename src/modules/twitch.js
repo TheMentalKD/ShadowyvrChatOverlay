@@ -142,7 +142,7 @@ async function connectTwitch(channel) {
 
   let reconnectTimer = null;
 
-  twitchClient.on('disconnected', (reason) => {
+  twitchClient.on('disconnected', async (reason) => {
     twitchConnected = false;
     sendToOverlay('chat-status', { state: 'disconnected', text: 'Disconnected' });
     sendToOverlay('chat-message', { username: 'System', text: `Disconnected: ${reason || 'unknown'}`, isSystem: true });
@@ -150,13 +150,17 @@ async function connectTwitch(channel) {
 
     if (reason?.toLowerCase().includes('login authentication failed')) {
       const cfg = getConfig();
-      cfg.twitchAuthToken = null;
-      cfg.twitchAuthUser = null;
-      saveConfig(cfg);
-      sendToOverlay('chat-status', { state: 'disconnected', text: 'Auth expired — please log in again' });
-      sendToOverlay('chat-message', { username: 'System', text: 'Your Twitch login has expired. Please log in again via Settings.', isSystem: true });
-      broadcastConfig();
-      return;
+      if (cfg.twitchAuthToken && (await isTokenValid(cfg.twitchAuthToken))) {
+        sendToOverlay('chat-message', { username: 'System', text: 'Connection reset — reconnecting…', isSystem: true });
+      } else {
+        cfg.twitchAuthToken = null;
+        cfg.twitchAuthUser = null;
+        saveConfig(cfg);
+        sendToOverlay('chat-status', { state: 'disconnected', text: 'Auth expired — please log in again' });
+        sendToOverlay('chat-message', { username: 'System', text: 'Your Twitch login has expired. Please log in again via Settings.', isSystem: true });
+        broadcastConfig();
+        return;
+      }
     }
 
     if (reconnectTimer) clearTimeout(reconnectTimer);
@@ -341,6 +345,17 @@ function disconnectEventSub() {
     eventSubWs = null;
   }
   eventSubSessionId = null;
+}
+
+async function isTokenValid(token) {
+  try {
+    const res = await fetch('https://id.twitch.tv/oauth2/validate', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
 }
 
 async function fetchTwitchUserId(login, token) {
